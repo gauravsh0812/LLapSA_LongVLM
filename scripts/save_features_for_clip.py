@@ -61,10 +61,10 @@ def get_seq_frames(total_num_frames, desired_num_frames):
 
 def split_tensor(tnsr):
     num_sub_tensors = 10
-    
+    print(tnsr.shape)
     # Ensure we have enough elements to create 10 sub-tensors
     if tnsr.shape[0] % num_sub_tensors != 0:
-        raise ValueError(f"DINO tensor length {tnsr.shape[0]} is not divisible by {num_sub_tensors}")
+        raise ValueError(f"image tensor length {tnsr.shape[0]} is not divisible by {num_sub_tensors}")
     
     sub_tensor_size = tnsr.shape[0] // num_sub_tensors
 
@@ -205,7 +205,7 @@ def main():
                     dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
                 with open(global_feat_path, 'wb') as f:
                     pickle.dump(global_feat, f)
-                    
+
             # except Exception as e:
             #     print(f"Can't process {video_path}: {e}")
 
