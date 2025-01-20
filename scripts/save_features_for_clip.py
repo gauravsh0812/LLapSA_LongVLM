@@ -140,7 +140,7 @@ def main():
         global_feat_path = f"{args.save_global_features_dir}/{video_id}.pkl"
 
         if (not os.path.exists(local_feat_path)) or (not os.path.exists(global_feat_path)) :
-            # try:
+            try:
                 video_path = f"{args.video_path}/{fyl}"
                 video = load_video(video_path)
                 video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
@@ -186,7 +186,7 @@ def main():
                     cross_attn_outputs.append(output.half())
                 
                 final_ca_output = torch.cat(cross_attn_outputs, dim=0)
-                print("final_ca_output: ", final_ca_output.shape)
+                # print("final_ca_output: ", final_ca_output.shape)
 
                 # merging
 
@@ -196,7 +196,7 @@ def main():
                     r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
                 ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
                 
-                print("local feat: ", local_feat.shape)
+                # print("local feat: ", local_feat.shape)
 
                 with open(local_feat_path, 'wb') as f:
                     pickle.dump(local_feat, f)
@@ -206,13 +206,13 @@ def main():
                     [mem[:, :1] for mem in final_ca_output], 
                     dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
                 
-                print("global feat: ", global_feat.shape)
+                # print("global feat: ", global_feat.shape)
 
                 with open(global_feat_path, 'wb') as f:
                     pickle.dump(global_feat, f)
 
-            # except Exception as e:
-            #     print(f"Can't process {video_path}: {e}")
+            except Exception as e:
+                print(f"Can't process {video_path}: {e}")
 
 
 if __name__ == "__main__":
