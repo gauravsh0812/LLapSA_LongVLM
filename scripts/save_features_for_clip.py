@@ -203,7 +203,9 @@ def main():
                 global_feat = torch.cat(
                     [mem[:, :1] for mem in final_ca_output.hidden_states], 
                     dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
-                
+                with open(global_feat_path, 'wb') as f:
+                    pickle.dump(global_feat, f)
+                    
             # except Exception as e:
             #     print(f"Can't process {video_path}: {e}")
 
