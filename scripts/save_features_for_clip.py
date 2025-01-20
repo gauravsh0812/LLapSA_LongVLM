@@ -112,7 +112,6 @@ def main():
     custom_config.num_attention_heads = 8
     custom_config.num_hidden_layers = 8
     custom_config.intermediate_size = custom_config.hidden_size * 4  # Standard in BERT
-    custom_config.num_attention_heads = 12  # Ensure divisibility of hidden_size by num_attention_heads
 
     # Initialize a model with the custom configuration
     model = BertModel(custom_config)
