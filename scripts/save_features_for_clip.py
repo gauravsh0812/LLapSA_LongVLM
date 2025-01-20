@@ -148,62 +148,62 @@ def main():
                 with torch.no_grad():
                     image_forward_outs = vision_tower(video_tensor, output_hidden_states=True).hidden_states[-2][:, 1:]
 
-                split_dino_tensors = split_tensor(image_forward_outs) # a list of [10,:,:] * N=10
+                # split_dino_tensors = split_tensor(image_forward_outs) # a list of [10,:,:] * N=10
 
-                # process text fragments using Bert
-                with open(f"{args.text_path}/{video_id}.json", "rb") as _f:
-                    text_json = json.load(_f)
+                # # process text fragments using Bert
+                # with open(f"{args.text_path}/{video_id}.json", "rb") as _f:
+                #     text_json = json.load(_f)
 
-                cross_attn_outputs = []
-                # print(text_json)
-                # print(text_json.keys())
-                for i, k in enumerate(["0-6","6-12","12-18","18-24","24-30",
-                        "30-36","36-42","42-48","48-54","54-60"]):
-                    # print(k)
-                    if k in text_json.keys():
-                        text = text_json[k]
-                        # print(text.split())
-                        if text == "null" or text == None or text == "":
-                            if args.text_option == 1:
-                                last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
-                            elif args.text_option == 0:
-                                last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
-                        else:
-                            inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
-                            with torch.no_grad():
-                                outputs = model(**inputs)
-                            last_hidden_state = outputs.last_hidden_state
+                # cross_attn_outputs = []
+                # # print(text_json)
+                # # print(text_json.keys())
+                # for i, k in enumerate(["0-6","6-12","12-18","18-24","24-30",
+                #         "30-36","36-42","42-48","48-54","54-60"]):
+                #     # print(k)
+                #     if k in text_json.keys():
+                #         text = text_json[k]
+                #         # print(text.split())
+                #         if text == "null" or text == None or text == "":
+                #             if args.text_option == 1:
+                #                 last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
+                #             elif args.text_option == 0:
+                #                 last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
+                #         else:
+                #             inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
+                #             with torch.no_grad():
+                #                 outputs = model(**inputs)
+                #             last_hidden_state = outputs.last_hidden_state
 
-                    else:
-                        if args.text_option == 1:
-                            last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
-                        elif args.text_option == 0:
-                            last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
+                #     else:
+                #         if args.text_option == 1:
+                #             last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
+                #         elif args.text_option == 0:
+                #             last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
 
 
-                    # cross attention
-                    output = cross_attention(split_dino_tensors[i], last_hidden_state)
-                    cross_attn_outputs.append(output.half())
+                #     # cross attention
+                #     output = cross_attention(split_dino_tensors[i], last_hidden_state)
+                #     cross_attn_outputs.append(output.half())
                 
-                final_ca_output = torch.cat(cross_attn_outputs, dim=0)
-                # print("final_ca_output: ", final_ca_output.shape)
+                # final_ca_output = torch.cat(cross_attn_outputs, dim=0)
+                # # print("final_ca_output: ", final_ca_output.shape)
 
-                # merging
+                # # merging
 
-                # local features
-                local_feat = merge_tokens(
-                    final_ca_output, 
-                    r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
-                ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
+                # # local features
+                # local_feat = merge_tokens(
+                #     final_ca_output, 
+                #     r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
+                # ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
                 
-                # print("local feat: ", local_feat.shape)
+                # # print("local feat: ", local_feat.shape)
 
-                with open(local_feat_path, 'wb') as f:
-                    pickle.dump(local_feat, f)
+                # with open(local_feat_path, 'wb') as f:
+                #     pickle.dump(local_feat, f)
 
                 # global_features 
                 global_feat = torch.cat(
-                    [mem[:, :1] for mem in final_ca_output], 
+                    [mem[:, :1] for mem in image_forward_outs.hidden_states], 
                     dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
                 
                 # print("global feat: ", global_feat.shape)
