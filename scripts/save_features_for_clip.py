@@ -141,7 +141,7 @@ def main():
 
         # if (not os.path.exists(local_feat_path)) or (not os.path.exists(global_feat_path)) :
         if (not os.path.exists(global_feat_path)):
-            try:
+            # try:
                 video_path = f"{args.video_path}/{fyl}"
                 video = load_video(video_path)
                 video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
@@ -212,8 +212,8 @@ def main():
                 with open(global_feat_path, 'wb') as f:
                     pickle.dump(global_feat, f)
 
-            except Exception as e:
-                print(f"Can't process {video_path}: {e}")
+            # except Exception as e:
+            #     print(f"Can't process {video_path}: {e}")
 
 
 if __name__ == "__main__":
