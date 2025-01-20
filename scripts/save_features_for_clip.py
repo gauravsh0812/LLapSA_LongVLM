@@ -129,7 +129,7 @@ def main():
 
 
     video_files = [f for f in os.listdir(args.video_path) 
-                  if f.replace(".mp4", ".json") in os.listdir(args.text_path)]
+                  if f.replace(".mp4", ".json") in os.listdir(args.text_path)][:10]
     
     for fyl in tqdm.tqdm(video_files, total=len(video_files)):
         video_id = fyl.split('.')[0]
