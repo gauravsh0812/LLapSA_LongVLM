@@ -412,7 +412,7 @@ class LazySupervisedDataset(Dataset):
             with open(f"{mem_folder}/{video_file}", "rb") as f:
                 mem_features = pickle.load(f)[-5:]
 
-            cur_token_len = 305 
+            cur_token_len = 205
             sources = preprocess_multimodal(
                 copy.deepcopy([e["conversations"] for e in sources]),
                 self.multimodal_cfg, cur_token_len)

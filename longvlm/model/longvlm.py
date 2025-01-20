@@ -77,11 +77,11 @@ class LongVLMLlamaModel(LlamaModel):
             inputs_embeds = self.embed_tokens(input_ids)
 
         if (input_ids.shape[1] != 1 or self.training) and local_features is not None:
-            print("memory_features shape: ", memory_features.shape)
-            print("localn feat shape: ", local_features.shape)
-            print("===============> SHAPE: ", torch.cat([memory_features, local_features], dim=1).shape)
+            # print("memory_features shape: ", memory_features.shape)
+            # print("local feat shape: ", local_features.shape)
+            # print("===============> SHAPE: ", torch.cat([memory_features, local_features], dim=1).shape)
             video_features = self.mm_projector(torch.cat([memory_features, local_features], dim=1))
-            exit()
+            # exit()
             new_input_embeds = []
             cur_video_idx = 0
             for cur_input_ids, cur_input_embeds in zip(input_ids, inputs_embeds):
