@@ -109,12 +109,17 @@ def main():
     custom_config = BertConfig.from_pretrained('bert-base-uncased')
     print(custom_config)
     custom_config.hidden_size = 1024
+    custom_config.num_attention_heads = 8
+    custom_config.num_hidden_layers = 8
     custom_config.intermediate_size = custom_config.hidden_size * 4  # Standard in BERT
     custom_config.num_attention_heads = 12  # Ensure divisibility of hidden_size by num_attention_heads
 
     # Initialize a model with the custom configuration
     model = BertModel(custom_config)
     model.eval()
+
+    for n, p in model.named_parameters():
+        p.requires_grad_(False)
 
     # vision model clip
     image_processor = CLIPImageProcessor.from_pretrained('openai/clip-vit-large-patch14', 
@@ -168,7 +173,8 @@ def main():
                                 last_hidden_state = torch.zeros(1,1, 1536)
                         else:
                             inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
-                            outputs = model(**inputs)
+                            with torch.no_grad():
+                                outputs = model(**inputs)
                             last_hidden_state = outputs.last_hidden_state
 
                     else:
