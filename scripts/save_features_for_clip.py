@@ -61,7 +61,6 @@ def get_seq_frames(total_num_frames, desired_num_frames):
 
 def split_tensor(tnsr):
     num_sub_tensors = 10
-    print(tnsr.shape)
     # Ensure we have enough elements to create 10 sub-tensors
     if tnsr.shape[0] % num_sub_tensors != 0:
         raise ValueError(f"image tensor length {tnsr.shape[0]} is not divisible by {num_sub_tensors}")
@@ -82,7 +81,7 @@ def cross_attention(image_tensor, text_tensor,):
     hidden_dim = image_tensor.shape[-1]
     num_heads = 8
 
-    text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1536]
+    text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1024]
 
     # MultiheadAttention module
     mha = MultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads, batch_first=True).cuda()
@@ -166,9 +165,9 @@ def main():
                         # print(text.split())
                         if text == "null" or text == None or text == "":
                             if args.text_option == 1:
-                                last_hidden_state = torch.ones(1,1, 1536)
+                                last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
                             elif args.text_option == 0:
-                                last_hidden_state = torch.zeros(1,1, 1536)
+                                last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
                         else:
                             inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
                             with torch.no_grad():
@@ -177,14 +176,14 @@ def main():
 
                     else:
                         if args.text_option == 1:
-                            last_hidden_state = torch.ones(1,1, 1536)
+                            last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
                         elif args.text_option == 0:
-                            last_hidden_state = torch.zeros(1,1, 1536)
+                            last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
 
 
                     # cross attention
                     output = cross_attention(split_dino_tensors[i], last_hidden_state)
-                    cross_attn_outputs.append(output)
+                    cross_attn_outputs.append(output.half())
                 
                 final_ca_output = torch.cat(cross_attn_outputs, dim=0)
                 print("final_ca_output: ", final_ca_output.shape)
