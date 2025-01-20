@@ -91,8 +91,8 @@ def cross_attention(image_tensor, text_tensor,):
 
     # Compute cross-attention
     # Queries are from the image, keys/values are from the text
-    text_tensor = text_tensor.cuda()
-    image_tensor = image_tensor.cuda()
+    text_tensor = text_tensor.float().cuda()
+    image_tensor = image_tensor.float().cuda()
     output, attention_weights = mha(query=image_tensor, key=text_tensor, value=text_tensor)
     return output
 
@@ -187,6 +187,7 @@ def main():
                     cross_attn_outputs.append(output)
                 
                 final_ca_output = torch.cat(cross_attn_outputs, dim=0)
+                print("final_ca_output: ", final_ca_output.shape)
 
                 # merging
 
