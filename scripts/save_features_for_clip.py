@@ -107,11 +107,10 @@ def main():
 
     # Create a new BERT configuration with a larger hidden size
     custom_config = BertConfig.from_pretrained('bert-base-uncased')
-    print(custom_config)
     custom_config.hidden_size = 1024
     custom_config.num_attention_heads = 8
     custom_config.num_hidden_layers = 8
-    custom_config.intermediate_size = custom_config.hidden_size * 4  # Standard in BERT
+    custom_config.intermediate_size = custom_config.hidden_size * 4  
 
     # Initialize a model with the custom configuration
     model = BertModel(custom_config)
@@ -142,7 +141,7 @@ def main():
         global_feat_path = f"{args.save_global_features_dir}/{video_id}.pkl"
 
         if (not os.path.exists(local_feat_path)) or (not os.path.exists(global_feat_path)) :
-            try:
+            # try:
                 video_path = f"{args.video_path}/{fyl}"
                 video = load_video(video_path)
                 video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
@@ -205,8 +204,8 @@ def main():
                     [mem[:, :1] for mem in final_ca_output.hidden_states], 
                     dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
                 
-            except Exception as e:
-                print(f"Can't process {video_path}: {e}")
+            # except Exception as e:
+            #     print(f"Can't process {video_path}: {e}")
 
 
 if __name__ == "__main__":
