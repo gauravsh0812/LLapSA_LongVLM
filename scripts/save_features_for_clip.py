@@ -13,7 +13,7 @@ from longvlm.merge import merge_tokens
 
 def parse_args():
     parser = argparse.ArgumentParser(description="getting text fragments")
-    parser.add_argument("--video_path", required=True, help="Path to DinoV2 tensors")
+    parser.add_argument("--video_path", required=True, help="Path to videos")
     parser.add_argument("--text_path", required=True, help="Path to 6sec text fragments")
     parser.add_argument("--text_option", default=0, help="How to treat null patches")
     parser.add_argument("--save_local_features_dir", required=True, help="directory to save the local features")
