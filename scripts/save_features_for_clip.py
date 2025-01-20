@@ -147,7 +147,7 @@ def main():
                 video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
                 video_tensor = video_tensor.half().cuda()
                 with torch.no_grad():
-                    image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
+                    image_forward_outs = vision_tower(video_tensor, output_hidden_states=True).hidden_states[-2][:, 1:]
 
                 split_dino_tensors = split_tensor(image_forward_outs) # a list of [10,:,:] * N=10
 
