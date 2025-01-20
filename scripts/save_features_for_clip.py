@@ -147,9 +147,9 @@ def main():
                 video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
                 video_tensor = video_tensor.half().cuda()
                 with torch.no_grad():
-                    image_forward_outs = vision_tower(video_tensor, output_hidden_states=True).hidden_states[-2][:, 1:]
+                    image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
 
-                # split_dino_tensors = split_tensor(image_forward_outs) # a list of [10,:,:] * N=10
+                # split_dino_tensors = split_tensor(image_forward_outs.hidden_states[-2][:, 1:]) # a list of [10,:,:] * N=10
 
                 # # process text fragments using Bert
                 # with open(f"{args.text_path}/{video_id}.json", "rb") as _f:
