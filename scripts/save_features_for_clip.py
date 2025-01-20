@@ -195,7 +195,9 @@ def main():
                     final_ca_output, 
                     r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
                 ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
-                    
+                
+                print("local feat: ", local_feat.shape)
+
                 with open(local_feat_path, 'wb') as f:
                     pickle.dump(local_feat, f)
 
@@ -203,6 +205,9 @@ def main():
                 global_feat = torch.cat(
                     [mem[:, :1] for mem in final_ca_output.hidden_states], 
                     dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
+                
+                print("global feat: ", global_feat.shape)
+
                 with open(global_feat_path, 'wb') as f:
                     pickle.dump(global_feat, f)
 
