@@ -98,7 +98,7 @@ def cross_attention(image_tensor, text_tensor,):
 def main():
     args = parse_args()
 
-    os.makedirs(args.save_local_features_dir, exist_ok=True)
+    # os.makedirs(args.save_local_features_dir, exist_ok=True)
     os.makedirs(args.save_global_features_dir, exist_ok=True)
     
     # Load pre-trained BERT tokenizer and model
@@ -136,10 +136,11 @@ def main():
     
     for fyl in tqdm.tqdm(video_files, total=len(video_files)):
         video_id = fyl.split('.')[0]
-        local_feat_path = f"{args.save_local_features_dir}/{video_id}.pkl"
+        # local_feat_path = f"{args.save_local_features_dir}/{video_id}.pkl"
         global_feat_path = f"{args.save_global_features_dir}/{video_id}.pkl"
 
-        if (not os.path.exists(local_feat_path)) or (not os.path.exists(global_feat_path)) :
+        # if (not os.path.exists(local_feat_path)) or (not os.path.exists(global_feat_path)) :
+        if (not os.path.exists(global_feat_path)):
             try:
                 video_path = f"{args.video_path}/{fyl}"
                 video = load_video(video_path)
