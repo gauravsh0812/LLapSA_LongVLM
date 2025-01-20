@@ -107,6 +107,7 @@ def main():
 
     # Create a new BERT configuration with a larger hidden size
     custom_config = BertConfig.from_pretrained('bert-base-uncased')
+    print(custom_config)
     custom_config.hidden_size = 1024
     custom_config.intermediate_size = custom_config.hidden_size * 4  # Standard in BERT
     custom_config.num_attention_heads = 12  # Ensure divisibility of hidden_size by num_attention_heads
