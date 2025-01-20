@@ -9,7 +9,7 @@ from decord import VideoReader, cpu
 from torch.nn import MultiheadAttention
 from transformers import BertTokenizer, BertModel, BertConfig
 from transformers import CLIPVisionModel, CLIPImageProcessor
-from longvlm.merge import merge_tokens
+from longvlm.model.merge import merge_tokens
 
 def parse_args():
     parser = argparse.ArgumentParser(description="getting text fragments")
