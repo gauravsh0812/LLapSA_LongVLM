@@ -211,7 +211,7 @@ def run_inference(args):
             # Clean output string
             output = outputs.strip().rstrip(stop_str).strip()
             sample_set['pred'] = output
-            print(outpu)
+            print(output)
             
             # if "consistency" in args.gt_file:
             #     ##### for question 2
