@@ -134,7 +134,7 @@ def run_inference(args):
 
     output_list = []  # List to store the output results
     
-    gt_contents = gt_contents[0:10]
+    gt_contents = gt_contents[0:1000]
 
     print(f"Need to process {len(gt_contents)} questions")
 
@@ -211,8 +211,7 @@ def run_inference(args):
             # Clean output string
             output = outputs.strip().rstrip(stop_str).strip()
             sample_set['pred'] = output
-            print("output: ", output)
-            print("=================" * 2)
+
             
             # if "consistency" in args.gt_file:
             #     ##### for question 2
