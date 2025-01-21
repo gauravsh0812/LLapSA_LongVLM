@@ -143,8 +143,8 @@ def run_inference(args):
         video_name = sample['video_id']
         sample_set = sample 
         question_1 = sample['q']
-        if 'consistency' in args.gt_file:
-            question_2 = sample['question2']
+        # if 'consistency' in args.gt_file:
+        #     question_2 = sample['question2']
 
         try:
             ## init
@@ -211,7 +211,8 @@ def run_inference(args):
             # Clean output string
             output = outputs.strip().rstrip(stop_str).strip()
             sample_set['pred'] = output
-            print(output)
+            print("output: ", output)
+            print("=================" * 2)
             
             # if "consistency" in args.gt_file:
             #     ##### for question 2
