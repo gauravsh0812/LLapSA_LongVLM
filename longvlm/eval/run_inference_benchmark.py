@@ -153,8 +153,8 @@ def run_inference(args):
             video_token_len = 0
             
             ## load from file
-            vid_path = os.path.join(args.vid_path, video_name + ".pkl")
-            mem_path = os.path.join(args.vid_mem_path, video_name + ".pkl")
+            vid_path = os.path.join(args.vid_path, video_name)# + ".pkl")
+            mem_path = os.path.join(args.vid_mem_path, video_name)# + ".pkl")
             # if "Local" in args.llm_model or ("Local" not in args.llm_model and "Global" not in args.llm_model):
             #     if os.path.exists(vid_path):
             with open(vid_path, 'rb') as f:
