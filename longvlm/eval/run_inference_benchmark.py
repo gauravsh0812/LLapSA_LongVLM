@@ -134,7 +134,7 @@ def run_inference(args):
 
     output_list = []  # List to store the output results
     
-    gt_contents = gt_contents[0:1000]
+    gt_contents = gt_contents[0:10]
 
     print(f"Need to process {len(gt_contents)} questions")
 
@@ -254,7 +254,6 @@ def run_inference(args):
                 del sample_set['pred']
                 ### add output
                 sample_set['pred2'] = output
-                print(output)
             
             output_list.append(sample_set)
         except Exception as e:
