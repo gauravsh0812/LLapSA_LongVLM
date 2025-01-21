@@ -142,7 +142,7 @@ def run_inference(args):
     for sample in tqdm(gt_contents):
         video_name = sample['video_id']
         sample_set = sample 
-        question_1 = sample['q']
+        question_1 = sample['question']
         # if 'consistency' in args.gt_file:
         #     question_2 = sample['question2']
 
