@@ -153,24 +153,24 @@ def run_inference(args):
             ## load from file
             vid_path = os.path.join(args.vid_path, video_name + ".pkl")
             mem_path = os.path.join(args.vid_mem_path, video_name + ".pkl")
-            if "Local" in args.llm_model or ("Local" not in args.llm_model and "Global" not in args.llm_model):
-                if os.path.exists(vid_path):
-                    with open(vid_path, 'rb') as f:
-                        local_features = pickle.load(f)
-                        local_features = torch.from_numpy(local_features).unsqueeze(0).cuda()
-                    video_token_len = local_features.shape[1]
-                else:
-                    print(f"{vid_path} not exists.")
+            # if "Local" in args.llm_model or ("Local" not in args.llm_model and "Global" not in args.llm_model):
+            #     if os.path.exists(vid_path):
+            with open(vid_path, 'rb') as f:
+                local_features = pickle.load(f)
+                local_features = torch.from_numpy(local_features).unsqueeze(0).cuda()
+            video_token_len = local_features.shape[1]
+                # else:
+                #     print(f"{vid_path} not exists.")
             
-            if "Global" in args.llm_model:
-                if os.path.exists(mem_path):
-                    with open(mem_path, 'rb') as f:
-                        mem_features = pickle.load(f)
-                        mem_features = torch.from_numpy(mem_features[-mem_num:]).unsqueeze(0).cuda()
-                    video_token_len += mem_features.shape[1]
-                else:
-                    print(f"{mem_path} not exists.")
-            print(video_token_len)
+            # if "Global" in args.llm_model:
+            #     if os.path.exists(mem_path):
+            with open(mem_path, 'rb') as f:
+                mem_features = pickle.load(f)
+                mem_features = torch.from_numpy(mem_features[-mem_num:]).unsqueeze(0).cuda()
+            video_token_len += mem_features.shape[1]
+                # else:
+                #     print(f"{mem_path} not exists.")
+            # print(video_token_len)
 
             ###### for question 1
             if model.get_model().vision_config.use_vid_start_end:
