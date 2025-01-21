@@ -5,7 +5,7 @@ import argparse
 import json
 from tqdm import tqdm
 import pickle
-from longvlm.eval.model_utils import initialize_model
+# from longvlm.eval.model_utils import initialize_model
 from transformers import AutoTokenizer
 from longvlm.utils import disable_torch_init
 from longvlm.constants import *
