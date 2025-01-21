@@ -134,6 +134,8 @@ def run_inference(args):
 
     output_list = []  # List to store the output results
     
+    gt_contents = gt_contents[0:1000]
+
     print(f"Need to process {len(gt_contents)} questions")
 
     # Iterate over each sample in the ground truth file
