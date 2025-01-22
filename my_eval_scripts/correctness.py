@@ -37,7 +37,7 @@ def eliminate_repetitive(text):
                     {
                     "role": "user",
                     "content": 
-                            "Here is the text: {text}"
+                            f"Here is the text: {text}"
                     }
 
                 ]
