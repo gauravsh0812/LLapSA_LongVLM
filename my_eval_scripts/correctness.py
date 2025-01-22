@@ -122,16 +122,16 @@ def main():
         ans = pc["answer"]
         pred = pc["pred"]
         vid = pc["video_id"]
-        if f"{vid}.txt" not in all_scr_files:
-            pred = eliminate_repetitive(pred)
-            print(pred)
-            exit()
-            response = annotate(qtn, pred, ans)
-            scr = response['score']
-            len_scores+=1
-            total_score += scr
-            with open(f"{args.output_dir}/correctness/scores/{vid}.txt", "w") as f:
-                f.write(f"{vid} -- {scr}")
+        # if f"{vid}.txt" not in all_scr_files:
+        pred = eliminate_repetitive(pred)
+        print(pred)
+        exit()
+        response = annotate(qtn, pred, ans)
+        scr = response['score']
+        len_scores+=1
+        total_score += scr
+        with open(f"{args.output_dir}/correctness/scores/{vid}.txt", "w") as f:
+            f.write(f"{vid} -- {scr}")
         
         # except:
         #     didnot_work+=1
