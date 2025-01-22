@@ -134,7 +134,7 @@ def run_inference(args):
 
     output_list = []  # List to store the output results
     
-    gt_contents = gt_contents[4000:5000]
+    gt_contents = gt_contents[5000:6500]
 
     print(f"Need to process {len(gt_contents)} questions")
 
