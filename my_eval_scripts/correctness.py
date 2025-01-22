@@ -15,6 +15,40 @@ args = parser.parse_args()
 
 openai.api_key = args.api_key
 
+def eliminate_repetitive(text):
+    """
+    Evaluates question and answer pairs using GPT-3
+    Returns a score for correctness
+    """
+    try:
+        # Compute the correctness score
+        completion = openai.ChatCompletion.create(
+                model=args.openai_model,
+                messages=[
+                    {
+                    "role": "system",
+                    "content": "You are an intelligent chatbot tasked with removing repetitiveness from a given text. \
+                                Follow these instructions:\n\n \
+                                ## INSTRUCTIONS:\n \
+                                - Preserve the main text as it is. \n \
+                                - Eliminate similar or redundant sentences to simplify the final text.\n \
+                                - DO NOT rewrite sentences; only remove extraneous ones."
+                    },
+                    {
+                    "role": "user",
+                    "content": 
+                            "Here is the text: {text}"
+                    }
+
+                ]
+            )
+        # Convert response to a Python dictionary.
+        response_message = completion["choices"][0]["message"]["content"]
+        return response_message
+
+    except Exception as e:
+        print(f"Error processing file {e}")
+
 def annotate(qtn, pred, ans):
 
     """
@@ -33,7 +67,8 @@ def annotate(qtn, pred, ans):
                                 "Your task is to compare the predicted answer with the correct answer and determine if they are factually consistent. Here's how you can accomplish the task:"
                                 "------"
                                 "##INSTRUCTIONS: "
-                                "-Focus on the factual consistency between the predicted answer and the correct answer. The predicted answer should not contain any misinterpretations or misinformation.\n"                                   "- The predicted answer must be factually accurate and align with the video content.\n"
+
+                                "- Focus on the factual consistency between the predicted answer and the correct answer. The predicted answer should not contain any misinterpretations or misinformation.\n"                                   "- The predicted answer must be factually accurate and align with the video content.\n"
                                 "- Consider synonyms or paraphrases as valid matches.\n"
                                 "- Evaluate the factual accuracy of the prediction compared to the answer."
                     },
@@ -87,13 +122,16 @@ def main():
             pred = pc["pred"]
             vid = pc["video_id"]
             if f"{vid}.txt" not in all_scr_files:
+                pred = eliminate_repetitive(pred)
+                print(pred)
+                exit()
                 response = annotate(qtn, pred, ans)
                 scr = response['score']
                 len_scores+=1
                 total_score += scr
                 with open(f"{args.output_dir}/correctness/scores/{vid}.txt", "w") as f:
                     f.write(f"{vid} -- {scr}")
-
+        
         except:
             didnot_work+=1
             print(f"{vid}.txt not working!")
