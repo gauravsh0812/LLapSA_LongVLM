@@ -123,6 +123,8 @@ def main():
         pred = pc["pred"]
         vid = pc["video_id"]
         # if f"{vid}.txt" not in all_scr_files:
+        print(pred)
+        print(" ")
         pred = eliminate_repetitive(pred)
         print(pred)
         exit()
