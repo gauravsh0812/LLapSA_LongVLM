@@ -116,25 +116,25 @@ def main():
     all_scr_files = os.listdir(f"{args.output_dir}/correctness/scores")
 
     for ind, pc  in enumerate(tqdm.tqdm(pred_contents, total=len(pred_contents))):
-        try:
-            qtn = pc["question"]
-            ans = pc["answer"]
-            pred = pc["pred"]
-            vid = pc["video_id"]
-            if f"{vid}.txt" not in all_scr_files:
-                pred = eliminate_repetitive(pred)
-                print(pred)
-                exit()
-                response = annotate(qtn, pred, ans)
-                scr = response['score']
-                len_scores+=1
-                total_score += scr
-                with open(f"{args.output_dir}/correctness/scores/{vid}.txt", "w") as f:
-                    f.write(f"{vid} -- {scr}")
+        # try:
+        qtn = pc["question"]
+        ans = pc["answer"]
+        pred = pc["pred"]
+        vid = pc["video_id"]
+        if f"{vid}.txt" not in all_scr_files:
+            pred = eliminate_repetitive(pred)
+            print(pred)
+            exit()
+            response = annotate(qtn, pred, ans)
+            scr = response['score']
+            len_scores+=1
+            total_score += scr
+            with open(f"{args.output_dir}/correctness/scores/{vid}.txt", "w") as f:
+                f.write(f"{vid} -- {scr}")
         
-        except:
-            didnot_work+=1
-            print(f"{vid}.txt not working!")
+        # except:
+        #     didnot_work+=1
+        #     print(f"{vid}.txt not working!")
 
     average_score = total_score / len_scores
 
