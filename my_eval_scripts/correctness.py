@@ -87,7 +87,6 @@ def main():
             pred = pc["pred"]
             vid = pc["video_id"]
             if f"{vid}.txt" not in all_scr_files:
-                
                 response = annotate(qtn, pred, ans)
                 scr = response['score']
                 len_scores+=1
