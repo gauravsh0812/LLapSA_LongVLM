@@ -59,22 +59,6 @@ def get_seq_frames(total_num_frames, desired_num_frames):
 
     return seq
 
-def split_tensor(tnsr):
-    num_sub_tensors = 10
-    # Ensure we have enough elements to create 10 sub-tensors
-    if tnsr.shape[0] % num_sub_tensors != 0:
-        raise ValueError(f"image tensor length {tnsr.shape[0]} is not divisible by {num_sub_tensors}")
-    
-    sub_tensor_size = tnsr.shape[0] // num_sub_tensors
-
-    sub_tensors = []
-    for i in range(num_sub_tensors):
-        start_idx = i * sub_tensor_size
-        end_idx = (i + 1) * sub_tensor_size
-        sub_tensor = tnsr[start_idx:end_idx]
-        sub_tensors.append(sub_tensor)
-    return sub_tensors
-
 def cross_attention(image_tensor, text_tensor,):
     
     # Define dimensions
@@ -132,7 +116,7 @@ def main():
 
 
     video_files = [f for f in os.listdir(args.video_path) 
-                  if f.replace(".mp4", ".json") in os.listdir(args.text_path)][4000:5000]
+                  if f.replace(".mp4", ".txt") in os.listdir(args.text_path)]
     
     for fyl in tqdm.tqdm(video_files, total=len(video_files)):
         video_id = fyl.split('.')[0]
@@ -140,63 +124,31 @@ def main():
         global_feat_path = f"{args.save_global_features_dir}/{video_id}.pkl"
 
         if (not os.path.exists(local_feat_path)) or (not os.path.exists(global_feat_path)) :
-            # try:
+            try:
                 video_path = f"{args.video_path}/{fyl}"
                 video = load_video(video_path)
                 video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
                 video_tensor = video_tensor.half().cuda()
                 with torch.no_grad():
                     image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
-
-                split_dino_tensors = split_tensor(image_forward_outs.hidden_states[-2][:, 1:]) # a list of [10,:,:] * N=10
-
-                # process text fragments using Bert
-                with open(f"{args.text_path}/{video_id}.json", "rb") as _f:
-                    text_json = json.load(_f)
-
-                cross_attn_outputs = []
-                # print(text_json)
-                # print(text_json.keys())
-                for i, k in enumerate(["0-6","6-12","12-18","18-24","24-30",
-                        "30-36","36-42","42-48","48-54","54-60"]):
-                    # print(k)
-                    if k in text_json.keys():
-                        text = text_json[k]
-                        # print(text.split())
-                        if text == "null" or text == None or text == "":
-                            if args.text_option == 1:
-                                last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
-                            elif args.text_option == 0:
-                                last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
-                        else:
-                            inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
-                            with torch.no_grad():
-                                outputs = model(**inputs)
-                            last_hidden_state = outputs.last_hidden_state
-
-                    else:
-                        if args.text_option == 1:
-                            last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
-                        elif args.text_option == 0:
-                            last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
-
-
-                    # cross attention
-                    output = cross_attention(split_dino_tensors[i], last_hidden_state)
-                    cross_attn_outputs.append(output.half())
+                image_forward_outs_for_local = image_forward_outs.hidden_states[-2][:, 1:]
                 
-                final_ca_output = torch.cat(cross_attn_outputs, dim=0)
-                # print("final_ca_output: ", final_ca_output.shape)
+                # process text fragments using Bert
+                text = open(f"{args.text_path}/{video_id}.txt").readlines()[0]
+                inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
+                with torch.no_grad():
+                    outputs = model(**inputs)
+                last_hidden_state = outputs.last_hidden_state
+
+                # cross attention
+                output = cross_attention(image_forward_outs_for_local, last_hidden_state)
 
                 # merging
-
                 # local features
                 local_feat = merge_tokens(
-                    final_ca_output, 
+                    output,
                     r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
                 ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
-                
-                # print("local feat: ", local_feat.shape)
 
                 with open(local_feat_path, 'wb') as f:
                     pickle.dump(local_feat, f)
@@ -205,14 +157,12 @@ def main():
                 global_feat = torch.cat(
                     [mem[:, :1] for mem in image_forward_outs.hidden_states], 
                     dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
-                
-                # print("global feat: ", global_feat.shape)
 
                 with open(global_feat_path, 'wb') as f:
                     pickle.dump(global_feat, f)
 
-            # except Exception as e:
-            #     print(f"Can't process {video_path}: {e}")
+            except Exception as e:
+                print(f"Can't process {video_path}: {e}")
 
 
 if __name__ == "__main__":
