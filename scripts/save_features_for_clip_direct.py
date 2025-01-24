@@ -61,9 +61,10 @@ def get_seq_frames(total_num_frames, desired_num_frames):
 def cross_attention(image_tensor, text_tensor,):
     
     # Define dimensions
+    print(image_tensor.shape, text_tensor.shape)
     hidden_dim = image_tensor.shape[-1]
     num_heads = 8
-
+    exit()
     text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1024]
 
     # MultiheadAttention module
