@@ -51,6 +51,7 @@ def main():
             output_content['conversations'].append({'from': 'gpt', 'value': content['a']})
             output_json_contents.append(output_content)
 
+
     print(f"Total annotations retained: {len(output_json_contents)}")
     with open(output_json_file, 'w') as f:
         json.dump(output_json_contents, f)
