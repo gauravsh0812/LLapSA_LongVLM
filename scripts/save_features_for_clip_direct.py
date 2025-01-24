@@ -61,7 +61,7 @@ def get_seq_frames(total_num_frames, desired_num_frames):
 def cross_attention(image_tensor, text_tensor,):
     
     # Define dimensions
-    print(image_tensor.shape, text_tensor.shape)
+    # print(image_tensor.shape, text_tensor.shape)
     assert image_tensor.shape[-1] == text_tensor.shape[-1], "Embedding dimensions must match!"
     hidden_dim = image_tensor.shape[-1]
     num_heads = 8
@@ -141,7 +141,7 @@ def main():
             
             # process text fragments using Bert
             text = open(f"{args.text_path}/{video_id}.txt").readlines()[0]
-            print(text)
+            # print(text)
             inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
             with torch.no_grad():
                 outputs = model(**inputs)
