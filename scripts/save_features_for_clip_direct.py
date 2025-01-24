@@ -121,7 +121,7 @@ def main():
     for f in os.listdir(args.video_path):
         if "_60sec_" in f and f.replace(".mp4", ".txt") in os.listdir(args.text_path):
             video_files.append(f)
-
+    print(len(video_files))
     video_files = video_files[:1000]
 
     for fyl in tqdm.tqdm(video_files, total=len(video_files)):
