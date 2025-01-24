@@ -62,11 +62,14 @@ def cross_attention(image_tensor, text_tensor,):
     
     # Define dimensions
     print(image_tensor.shape, text_tensor.shape)
+    assert image_tensor.shape[-1] == text_tensor.shape[-1], "Embedding dimensions must match!"
     hidden_dim = image_tensor.shape[-1]
     num_heads = 8
-    exit()
-    text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1024]
-
+    
+    # Ensure the text_tensor batch matches the image_tensor batch
+    if text_tensor.shape[0] != image_tensor.shape[0]:
+        text_tensor = text_tensor.repeat(image_tensor.shape[0], 1, 1)
+    
     # MultiheadAttention module
     mha = MultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads, batch_first=True).cuda()
     for param in mha.parameters():
