@@ -14,8 +14,7 @@ from longvlm.model.merge import merge_tokens
 def parse_args():
     parser = argparse.ArgumentParser(description="getting text fragments")
     parser.add_argument("--video_path", required=True, help="Path to videos")
-    parser.add_argument("--text_path", required=True, help="Path to 6sec text fragments")
-    parser.add_argument("--text_option", default=0, help="How to treat null patches")
+    parser.add_argument("--text_path", required=True, help="Path to structured text")
     parser.add_argument("--save_local_features_dir", required=True, help="directory to save the local features")
     parser.add_argument("--save_global_features_dir", required=True, help="directory to save the global features")
     
@@ -114,55 +113,58 @@ def main():
     for n, p in vision_tower.named_parameters():
         p.requires_grad_(False)
 
+    video_files = []
+    for f in os.listdir(args.video_path):
+        if "_60sec_" in f and f.replace(".mp4", ".txt") in os.listdir(args.text_path):
+            video_files.append(f)
 
-    video_files = [f for f in os.listdir(args.video_path) 
-                  if f.replace(".mp4", ".txt") in os.listdir(args.text_path)]
-    
+    video_files = video_files[:1000]
+
     for fyl in tqdm.tqdm(video_files, total=len(video_files)):
         video_id = fyl.split('.')[0]
         local_feat_path = f"{args.save_local_features_dir}/{video_id}.pkl"
         global_feat_path = f"{args.save_global_features_dir}/{video_id}.pkl"
 
         if (not os.path.exists(local_feat_path)) or (not os.path.exists(global_feat_path)) :
-            try:
-                video_path = f"{args.video_path}/{fyl}"
-                video = load_video(video_path)
-                video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
-                video_tensor = video_tensor.half().cuda()
-                with torch.no_grad():
-                    image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
-                image_forward_outs_for_local = image_forward_outs.hidden_states[-2][:, 1:]
-                
-                # process text fragments using Bert
-                text = open(f"{args.text_path}/{video_id}.txt").readlines()[0]
-                inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
-                with torch.no_grad():
-                    outputs = model(**inputs)
-                last_hidden_state = outputs.last_hidden_state
+            # try:
+            video_path = f"{args.video_path}/{fyl}"
+            video = load_video(video_path)
+            video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
+            video_tensor = video_tensor.half().cuda()
+            with torch.no_grad():
+                image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
+            image_forward_outs_for_local = image_forward_outs.hidden_states[-2][:, 1:]
+            
+            # process text fragments using Bert
+            text = open(f"{args.text_path}/{video_id}.txt").readlines()[0]
+            inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
+            with torch.no_grad():
+                outputs = model(**inputs)
+            last_hidden_state = outputs.last_hidden_state
 
-                # cross attention
-                output = cross_attention(image_forward_outs_for_local, last_hidden_state)
+            # cross attention
+            output = cross_attention(image_forward_outs_for_local, last_hidden_state)
 
-                # merging
-                # local features
-                local_feat = merge_tokens(
-                    output,
-                    r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
-                ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
+            # merging
+            # local features
+            local_feat = merge_tokens(
+                output,
+                r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
+            ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
 
-                with open(local_feat_path, 'wb') as f:
-                    pickle.dump(local_feat, f)
+            with open(local_feat_path, 'wb') as f:
+                pickle.dump(local_feat, f)
 
-                # global_features 
-                global_feat = torch.cat(
-                    [mem[:, :1] for mem in image_forward_outs.hidden_states], 
-                    dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
+            # global_features 
+            global_feat = torch.cat(
+                [mem[:, :1] for mem in image_forward_outs.hidden_states], 
+                dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
 
-                with open(global_feat_path, 'wb') as f:
-                    pickle.dump(global_feat, f)
+            with open(global_feat_path, 'wb') as f:
+                pickle.dump(global_feat, f)
 
-            except Exception as e:
-                print(f"Can't process {video_path}: {e}")
+            # except Exception as e:
+            #     print(f"Can't process {video_path}: {e}")
 
 
 if __name__ == "__main__":
