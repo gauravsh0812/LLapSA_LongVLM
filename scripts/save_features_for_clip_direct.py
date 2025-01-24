@@ -138,6 +138,7 @@ def main():
             
             # process text fragments using Bert
             text = open(f"{args.text_path}/{video_id}.txt").readlines()[0]
+            print(text)
             inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
             with torch.no_grad():
                 outputs = model(**inputs)
