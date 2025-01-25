@@ -101,7 +101,9 @@ def cross_attention(image_tensor, text_tensor):
     image_tensor = image_tensor.float().cuda()
     
     feature_dim = image_tensor.shape[-1]
-    
+    batch_size = image_tensor.shape[0]
+    num_frames = image_tensor.shape[1]
+
     print(image_tensor.shape, text_tensor.shape)
     # Ensure the text_tensor batch matches the image_tensor batch
     if text_tensor.shape[0] != image_tensor.shape[0]:
@@ -119,12 +121,12 @@ def cross_attention(image_tensor, text_tensor):
     
     # Summarize attention over text sequence
     frame_scores = attention_weights.sum(dim=1)  # [10, 256]
-    
-    # Get the top 6 frames for each batch
-    topk_values, topk_indices = torch.topk(frame_scores, k=6, dim=-1)  # [10, 6]
-    
-    print(topk_values, topk_indices)
 
+    # Get the top 6 images based on their scores
+    topk_values, topk_indices = torch.topk(frame_scores, k=6, dim=0)  # [6]
+
+    # Extract the top 6 images
+    top_images = image_tensor[topk_indices]  # [6, 256]
     # Extract the top 6 frames from the image tensor
     # Gather operation to fetch the top frames
     top_frames = torch.gather(image_tensor, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [10, 6, 1024]
