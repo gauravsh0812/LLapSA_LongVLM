@@ -132,7 +132,8 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
         # Gather operation to fetch the top frames
         top_frames = torch.gather(top_images, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [10, 6, 1024]
     else:
-        selected_indices = torch.randperm(10)[:6].float().cuda()  # Get random indices for 6 frames
+        selected_indices = torch.randint(0, 10, (6,)).float().cuda()
+        # Extract the top 6 images based on their scores
         # Extract the top 6 images based on their scores
         top_images = image_tensor[selected_indices]  # [6, 256]      
         top_frames = torch.gather(image_tensor, dim=1, index=torch.tensor(selected_indices).unsqueeze(-1).expand(-1, feature_dim))  # [6, 256]  
