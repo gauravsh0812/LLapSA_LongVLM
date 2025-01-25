@@ -211,10 +211,10 @@ def main():
                         # print(text.split())
                         if text == "null" or text == None or text == "":
                             null_flag = True
-                            if args.text_option == 1:
-                                last_hidden_state = torch.ones(1,255, custom_config.hidden_size)
-                            elif args.text_option == 0:
-                                last_hidden_state = torch.zeros(1,255, custom_config.hidden_size)
+                            # if args.text_option == 1:
+                            #     last_hidden_state = torch.ones(1,255, custom_config.hidden_size)
+                            # elif args.text_option == 0:
+                            # last_hidden_state = torch.zeros(1,255, custom_config.hidden_size)
                         else:
                             inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
                             with torch.no_grad():
@@ -223,13 +223,17 @@ def main():
 
                     else:
                         null_flag = True
-                        if args.text_option == 1:
-                            last_hidden_state = torch.ones(1,255, custom_config.hidden_size)
-                        elif args.text_option == 0:
-                            last_hidden_state = torch.zeros(1,255, custom_config.hidden_size)
+
+                        # if args.text_option == 1:
+                        #     last_hidden_state = torch.ones(1,255, custom_config.hidden_size)
+                        # elif args.text_option == 0:
+                        #     last_hidden_state = torch.zeros(1,255, custom_config.hidden_size)
 
 
                     # cross attention
+                    if null_flag: 
+                        last_hidden_state = torch.zeros(1,255, custom_config.hidden_size)
+                        
                     output = cross_attention(split_dino_tensors[i], last_hidden_state, null_flag)
                     cross_attn_outputs.append(output.half())
                 
