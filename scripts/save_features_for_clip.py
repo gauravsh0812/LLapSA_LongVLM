@@ -97,6 +97,9 @@ def split_tensor(tnsr):
 
 def cross_attention(image_tensor, text_tensor):
 
+    text_tensor = text_tensor.float().cuda()
+    image_tensor = image_tensor.float().cuda()
+    
     feature_dim = image_tensor.shape[-1]
     
     print(image_tensor.shape, text_tensor.shape)
