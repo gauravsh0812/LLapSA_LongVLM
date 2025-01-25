@@ -75,25 +75,60 @@ def split_tensor(tnsr):
         sub_tensors.append(sub_tensor)
     return sub_tensors
 
-def cross_attention(image_tensor, text_tensor,):
+# def cross_attention(image_tensor, text_tensor,):
     
-    # Define dimensions
-    hidden_dim = image_tensor.shape[-1]
-    num_heads = 8
+#     # Define dimensions
+#     hidden_dim = image_tensor.shape[-1]
+#     num_heads = 8
 
-    text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1024]
+#     text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1024]
 
-    # MultiheadAttention module
-    mha = MultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads, batch_first=True).cuda()
-    for param in mha.parameters():
-        param.requires_grad = False
+#     # MultiheadAttention module
+#     mha = MultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads, batch_first=True).cuda()
+#     for param in mha.parameters():
+#         param.requires_grad = False
 
-    # Compute cross-attention
-    # Queries are from the image, keys/values are from the text
-    text_tensor = text_tensor.float().cuda()
-    image_tensor = image_tensor.float().cuda()
-    output, attention_weights = mha(query=image_tensor, key=text_tensor, value=text_tensor)
-    return output
+#     # Compute cross-attention
+#     # Queries are from the image, keys/values are from the text
+#     text_tensor = text_tensor.float().cuda()
+#     image_tensor = image_tensor.float().cuda()
+#     output, attention_weights = mha(query=image_tensor, key=text_tensor, value=text_tensor)
+#     return output
+
+def cross_attention(image_tensor, text_tensor):
+
+    batch_size = image_tensor.shape[0]
+    text_seq_len = text_tensor.shape[1]
+    image_seq_len = image_tensor.shape[1]
+    feature_dim = image_tensor.shape[-1]
+    
+    # Input tensors
+    image_tensor = torch.randn(batch_size, image_seq_len, feature_dim)  # [10, 256, 1024]
+    text_tensor = torch.randn(batch_size, text_seq_len, feature_dim)   # [10, 141, 1024]
+    
+    # Compute Q, K, and V for cross-attention
+    Q = text_tensor  # Query
+    K = image_tensor  # Key
+    V = image_tensor  # Value
+    d_k = feature_dim
+    
+    # Compute attention scores
+    attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [10, 141, 256]
+    attention_weights = torch.softmax(attention_scores, dim=-1)  # [10, 141, 256]
+    
+    # Summarize attention over text sequence
+    frame_scores = attention_weights.sum(dim=1)  # [10, 256]
+    
+    # Get the top 6 frames for each batch
+    topk_values, topk_indices = torch.topk(frame_scores, k=6, dim=-1)  # [10, 6]
+    
+    # Extract the top 6 frames from the image tensor
+    # Gather operation to fetch the top frames
+    top_frames = torch.gather(image_tensor, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [10, 6, 1024]
+    
+    # Output
+    print("Top frames tensor shape:", top_frames.shape)
+
 
 def main():
     args = parse_args()
@@ -132,7 +167,7 @@ def main():
 
 
     video_files = [f for f in os.listdir(args.video_path) 
-                  if f.replace(".mp4", ".json") in os.listdir(args.text_path)][4000:5000]
+                  if f.replace(".mp4", ".json") in os.listdir(args.text_path)][0:10]
     
     for fyl in tqdm.tqdm(video_files, total=len(video_files)):
         video_id = fyl.split('.')[0]

@@ -211,50 +211,6 @@ def run_inference(args):
             # Clean output string
             output = outputs.strip().rstrip(stop_str).strip()
             sample_set['pred'] = output
-
-            
-            # if "consistency" in args.gt_file:
-            #     ##### for question 2
-            #     if model.get_model().vision_config.use_vid_start_end:
-            #         qs = DEFAULT_VID_START_TOKEN + DEFAULT_VIDEO_PATCH_TOKEN * video_token_len + DEFAULT_VID_END_TOKEN + '\n' + question_2
-            #     else:
-            #         qs = DEFAULT_VIDEO_PATCH_TOKEN * video_token_len + '\n' + question_2
-            #     # Prepare conversation prompt
-            #     conv = conv_templates[conv_mode].copy()
-            #     conv.append_message(conv.roles[0], qs)
-            #     conv.append_message(conv.roles[1], None)
-            #     prompt = conv.get_prompt()
-            #     # Tokenize the prompt
-            #     inputs = tokenizer([prompt])
-            #     # Move inputs to GPU
-            #     input_ids = torch.as_tensor(inputs.input_ids).cuda() # to(device) #.cuda() # to(torch.device('cuda')) # .to(device) #.cuda()
-            #     # Define stopping criteria for generation
-            #     stop_str = conv.sep if conv.sep_style != SeparatorStyle.TWO else conv.sep2
-            #     stopping_criteria = KeywordsStoppingCriteria([stop_str], tokenizer, input_ids)
-                
-            #     # Run model inference
-            #     with torch.inference_mode():
-            #         output_ids = model.generate(
-            #             input_ids,
-            #             local_features=local_features,
-            #             memory_features=mem_features,
-            #             do_sample=True,
-            #             temperature=0.2,
-            #             max_new_tokens=1024,
-            #             stopping_criteria=[stopping_criteria],
-            #             )
-            #     n_diff_input_output = (input_ids != output_ids[:, :input_ids.shape[1]]).sum().item()
-            #     if n_diff_input_output > 0:
-            #         print(f'[Warning] {n_diff_input_output} output_ids are not the same as the input_ids')
-            #     # Decode output tokens
-            #     outputs = tokenizer.batch_decode(output_ids[:, input_ids.shape[1]:], skip_special_tokens=True)[0]
-            #     # Clean output string
-            #     output = outputs.strip().rstrip(stop_str).strip()
-            #     ### update name
-            #     sample_set['pred1'] = sample_set['pred']
-            #     del sample_set['pred']
-            #     ### add output
-            #     sample_set['pred2'] = output
             
             output_list.append(sample_set)
         except Exception as e:
