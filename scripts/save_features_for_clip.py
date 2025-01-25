@@ -97,14 +97,12 @@ def split_tensor(tnsr):
 
 def cross_attention(image_tensor, text_tensor):
 
-    batch_size = image_tensor.shape[0]
-    text_seq_len = text_tensor.shape[1]
-    image_seq_len = image_tensor.shape[1]
     feature_dim = image_tensor.shape[-1]
     
-    # Input tensors
-    image_tensor = torch.randn(batch_size, image_seq_len, feature_dim)  # [10, 256, 1024]
-    text_tensor = torch.randn(batch_size, text_seq_len, feature_dim)   # [10, 141, 1024]
+    print(image_tensor.shape, text_tensor.shape)
+    # Ensure the text_tensor batch matches the image_tensor batch
+    if text_tensor.shape[0] != image_tensor.shape[0]:
+        text_tensor = text_tensor.repeat(image_tensor.shape[0], 1, 1)
     
     # Compute Q, K, and V for cross-attention
     Q = text_tensor  # Query
@@ -128,6 +126,7 @@ def cross_attention(image_tensor, text_tensor):
     
     # Output
     print("Top frames tensor shape:", top_frames.shape)
+    exit()
 
 
 def main():
