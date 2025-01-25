@@ -95,7 +95,7 @@ def split_tensor(tnsr):
 #     output, attention_weights = mha(query=image_tensor, key=text_tensor, value=text_tensor)
 #     return output
 
-def cross_attention(image_tensor, text_tensor):
+def cross_attention(image_tensor, text_tensor, null_flag=False):
 
     text_tensor = text_tensor.float().cuda()
     image_tensor = image_tensor.float().cuda()
@@ -109,31 +109,36 @@ def cross_attention(image_tensor, text_tensor):
     if text_tensor.shape[0] != image_tensor.shape[0]:
         text_tensor = text_tensor.repeat(image_tensor.shape[0], 1, 1)
     
-    # Compute Q, K, and V for cross-attention
-    Q = text_tensor  # Query
-    K = image_tensor  # Key
-    V = image_tensor  # Value
-    d_k = feature_dim
-    
-    # Compute attention scores
-    attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [10, 141, 256]
-    attention_weights = torch.softmax(attention_scores, dim=-1)  # [10, 141, 256]
-    
-    # Summarize attention over text sequence
-    frame_scores = attention_weights.sum(dim=1)  # [10, 256]
+    if null_flag:
+        # Compute Q, K, and V for cross-attention
+        Q = text_tensor  # Query
+        K = image_tensor  # Key
+        V = image_tensor  # Value
+        d_k = feature_dim
+        
+        # Compute attention scores
+        attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [10, 141, 256]
+        attention_weights = torch.softmax(attention_scores, dim=-1)  # [10, 141, 256]
+        
+        # Summarize attention over text sequence
+        frame_scores = attention_weights.sum(dim=1)  # [10, 256]
 
-    # Get the top 6 images based on their scores
-    topk_values, topk_indices = torch.topk(frame_scores, k=6, dim=0)  # [6]
+        # Get the top 6 images based on their scores
+        topk_values, topk_indices = torch.topk(frame_scores, k=6, dim=0)  # [6]
 
-    # Extract the top 6 images
-    top_images = image_tensor[topk_indices]  # [6, 256]
+        # Extract the top 6 images
+        top_images = image_tensor[topk_indices]  # [6, 256]
+    else:
+        selected_indices = torch.randperm(10)[:6]  # Get random indices for 6 frames
+    
+        # Extract the top 6 images based on their scores
+        top_images = image_tensor[selected_indices]  # [6, 256]        
+    
     # Extract the top 6 frames from the image tensor
     # Gather operation to fetch the top frames
-    top_frames = torch.gather(image_tensor, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [10, 6, 1024]
+    top_frames = torch.gather(top_images, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [10, 6, 1024]
+    print(top_frames.shape)
     return top_frames
-    # Output
-    # print("Top frames tensor shape:", top_frames.shape)
-    # exit()
 
 
 def main():
@@ -201,10 +206,12 @@ def main():
                 for i, k in enumerate(["0-6","6-12","12-18","18-24","24-30",
                         "30-36","36-42","42-48","48-54","54-60"]):
                     # print(k)
+                    null_flag = False
                     if k in text_json.keys():
                         text = text_json[k]
                         # print(text.split())
                         if text == "null" or text == None or text == "":
+                            null_flag = True
                             if args.text_option == 1:
                                 last_hidden_state = torch.ones(1,256, custom_config.hidden_size)
                             elif args.text_option == 0:
@@ -216,6 +223,7 @@ def main():
                             last_hidden_state = outputs.last_hidden_state
 
                     else:
+                        null_flag = True
                         if args.text_option == 1:
                             last_hidden_state = torch.ones(1,256, custom_config.hidden_size)
                         elif args.text_option == 0:
@@ -223,7 +231,7 @@ def main():
 
 
                     # cross attention
-                    output = cross_attention(split_dino_tensors[i], last_hidden_state)
+                    output = cross_attention(split_dino_tensors[i], last_hidden_state, null_flag)
                     cross_attn_outputs.append(output.half())
                 
                 final_ca_output = torch.cat(cross_attn_outputs, dim=0)
