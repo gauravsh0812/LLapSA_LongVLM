@@ -132,8 +132,8 @@ def cross_attention(image_tensor, text_tensor):
     top_frames = torch.gather(image_tensor, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [10, 6, 1024]
     
     # Output
-    print("Top frames tensor shape:", top_frames.shape)
-    exit()
+    # print("Top frames tensor shape:", top_frames.shape)
+    # exit()
 
 
 def main():
@@ -206,9 +206,9 @@ def main():
                         # print(text.split())
                         if text == "null" or text == None or text == "":
                             if args.text_option == 1:
-                                last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
+                                last_hidden_state = torch.ones(1,256, custom_config.hidden_size)
                             elif args.text_option == 0:
-                                last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
+                                last_hidden_state = torch.zeros(1,256, custom_config.hidden_size)
                         else:
                             inputs = tokenizer(text, return_tensors='pt', max_length=512, padding=True, truncation=True)
                             with torch.no_grad():
@@ -217,9 +217,9 @@ def main():
 
                     else:
                         if args.text_option == 1:
-                            last_hidden_state = torch.ones(1,1, custom_config.hidden_size)
+                            last_hidden_state = torch.ones(1,256, custom_config.hidden_size)
                         elif args.text_option == 0:
-                            last_hidden_state = torch.zeros(1,1, custom_config.hidden_size)
+                            last_hidden_state = torch.zeros(1,256, custom_config.hidden_size)
 
 
                     # cross attention
