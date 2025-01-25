@@ -130,7 +130,7 @@ def cross_attention(image_tensor, text_tensor):
     # Extract the top 6 frames from the image tensor
     # Gather operation to fetch the top frames
     top_frames = torch.gather(image_tensor, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [10, 6, 1024]
-    
+    return top_frames
     # Output
     # print("Top frames tensor shape:", top_frames.shape)
     # exit()
