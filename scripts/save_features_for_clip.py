@@ -104,7 +104,7 @@ def cross_attention(image_tensor, text_tensor):
     batch_size = image_tensor.shape[0]
     num_frames = image_tensor.shape[1]
 
-    print(image_tensor.shape, text_tensor.shape)
+    # print(image_tensor.shape, text_tensor.shape)
     # Ensure the text_tensor batch matches the image_tensor batch
     if text_tensor.shape[0] != image_tensor.shape[0]:
         text_tensor = text_tensor.repeat(image_tensor.shape[0], 1, 1)
