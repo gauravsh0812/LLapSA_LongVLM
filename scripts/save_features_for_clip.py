@@ -122,7 +122,7 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
         # Summarize attention over text sequence
         image_relevance_scores = attention_weights.sum(dim=1)  # [batch_size, image_len]
         topk_values, topk_indices = torch.topk(image_relevance_scores, k=6, dim=1)  # [batch_size, k]
-        print(top_values)
+        print(topk_values)
         exit()
 
         # Extract top-k frames
