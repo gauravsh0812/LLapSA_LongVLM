@@ -77,69 +77,71 @@ def split_tensor(tnsr):
         sub_tensors.append(sub_tensor)
     return sub_tensors
 
-# def cross_attention(image_tensor, text_tensor,):
+def cross_attention(image_tensor, text_tensor,):
     
-#     # Define dimensions
-#     hidden_dim = image_tensor.shape[-1]
-#     num_heads = 8
+    # Define dimensions
+    hidden_dim = image_tensor.shape[-1]
+    num_heads = 8
 
-#     text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1024]
+    text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1024]
 
-#     # MultiheadAttention module
-#     mha = MultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads, batch_first=True).cuda()
-#     for param in mha.parameters():
-#         param.requires_grad = False
+    # MultiheadAttention module
+    mha = MultiheadAttention(embed_dim=hidden_dim, num_heads=num_heads, batch_first=True).cuda()
+    for param in mha.parameters():
+        param.requires_grad = False
 
-#     # Compute cross-attention
-#     # Queries are from the image, keys/values are from the text
-#     text_tensor = text_tensor.float().cuda()
-#     image_tensor = image_tensor.float().cuda()
-#     output, attention_weights = mha(query=image_tensor, key=text_tensor, value=text_tensor)
-#     return output
-
-def cross_attention(image_tensor, text_tensor, null_flag=False):
-
+    # Compute cross-attention
+    # Queries are from the image, keys/values are from the text
     text_tensor = text_tensor.float().cuda()
     image_tensor = image_tensor.float().cuda()
-    
-    feature_dim = image_tensor.shape[-1]
-    batch_size = image_tensor.shape[0]
-    num_frames = image_tensor.shape[1]
+    output, attention_weights = mha(query=image_tensor, key=text_tensor, value=text_tensor)
+    print(attention_weights)
+    exit()
+    return output
 
-    # print(image_tensor.shape, text_tensor.shape)
-    # Ensure the text_tensor batch matches the image_tensor batch
-    if text_tensor.shape[0] != image_tensor.shape[0]:
-        text_tensor = text_tensor.repeat(image_tensor.shape[0], 1, 1)
+# def cross_attention(image_tensor, text_tensor, null_flag=False):
+
+#     text_tensor = text_tensor.float().cuda()
+#     image_tensor = image_tensor.float().cuda()
     
-    if not null_flag:
-        Q = text_tensor  # Query
-        K = image_tensor  # Key
-        V = image_tensor  # Value
-        d_k = Q.size(-1)
+#     feature_dim = image_tensor.shape[-1]
+#     batch_size = image_tensor.shape[0]
+#     num_frames = image_tensor.shape[1]
+
+#     # print(image_tensor.shape, text_tensor.shape)
+#     # Ensure the text_tensor batch matches the image_tensor batch
+#     if text_tensor.shape[0] != image_tensor.shape[0]:
+#         text_tensor = text_tensor.repeat(image_tensor.shape[0], 1, 1)
+    
+#     if not null_flag:
+#         Q = text_tensor  # Query
+#         K = image_tensor  # Key
+#         V = image_tensor  # Value
+#         d_k = Q.size(-1)
         
-        # Scaled Dot-Product Attention
-        attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [batch_size, text_len, image_len]
-        # attention_weights = torch.softmax(attention_scores, dim=-1)  # [batch_size, text_len, image_len]
+#         # Scaled Dot-Product Attention
+#         attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [batch_size, text_len, image_len]
+#         # attention_weights = torch.softmax(attention_scores, dim=-1)  # [batch_size, text_len, image_len]
 
-        # Summarize attention over text sequence
-        image_relevance_scores = attention_scores.sum(dim=1)  # [batch_size, image_len]
-        print(image_relevance_scores)
-        print(image_relevance_scores.sum(dim=1))
-        # topk_values, topk_indices = torch.topk(image_relevance_scores, k=6, dim=1)  # [batch_size, k]
-        # print(topk_values)
-        exit()
+#         # Summarize attention over text sequence
+#         image_relevance_scores = attention_scores.sum(dim=1)  # [batch_size, image_len]
+#         print(image_relevance_scores)
+#         print(image_relevance_scores.sum(dim=1))
+#         # topk_values, topk_indices = torch.topk(image_relevance_scores, k=6, dim=1)  # [batch_size, k]
+#         # print(topk_values)
+#         exit()
 
-        # Extract top-k frames
-        batch_indices = torch.arange(image_tensor.size(0)).unsqueeze(-1).expand(-1, k=6)  # [batch_size, k]
-        top_frames = image_tensor[batch_indices, topk_indices]  # [batch_size, k, feature_dim]
-        print("not null: ",top_frames.shape)
+#         # Extract top-k frames
+#         batch_indices = torch.arange(image_tensor.size(0)).unsqueeze(-1).expand(-1, k=6)  # [batch_size, k]
+#         top_frames = image_tensor[batch_indices, topk_indices]  # [batch_size, k, feature_dim]
+#         print("not null: ",top_frames.shape)
 
-    else:
-        indices = torch.randperm(10)[:6]
-        top_frames = image_tensor[indices]    
-        print("null: ",top_frames.shape)
+#     else:
+#         indices = torch.randperm(10)[:6]
+#         top_frames = image_tensor[indices]    
+#         print("null: ",top_frames.shape)
 
-    return top_frames
+#     return top_frames
 
 
 def main():
