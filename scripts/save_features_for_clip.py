@@ -94,7 +94,7 @@ def cross_attention(image_tensor, text_tensor,null_flag):
     # Queries are from the image, keys/values are from the text
     text_tensor = text_tensor.float().cuda()
     image_tensor = image_tensor.float().cuda()
-    output, attention_weights = mha(query=image_tensor, key=text_tensor, value=text_tensor)
+    output, attention_weights = mha(query=text_tensor, key=image_tensor, value=image_tensor)
     print(attention_weights.shape)
     exit()
     return output
