@@ -110,33 +110,43 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
         text_tensor = text_tensor.repeat(image_tensor.shape[0], 1, 1)
     
     if not null_flag:
-        # Compute Q, K, and V for cross-attention
         Q = text_tensor  # Query
         K = image_tensor  # Key
         V = image_tensor  # Value
-        d_k = feature_dim
+        d_k = Q.size(-1)
         
-        # Compute attention scores
-        attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [10, xt, 256]
-        attention_weights = torch.softmax(attention_scores, dim=-1)  # [10, xt, 256]
-        
+        # Scaled Dot-Product Attention
+        attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [batch_size, text_len, image_len]
+        attention_weights = torch.softmax(attention_scores, dim=-1)  # [batch_size, text_len, image_len]
+
         # Summarize attention over text sequence
-        frame_scores = attention_weights.sum(dim=2)  # [10, xt]
+        image_relevance_scores = attention_weights.sum(dim=1)  # [batch_size, image_len]
 
-        # Get the top 6 images based on their scores
-        topk_values, topk_indices = torch.topk(frame_scores, k=6, dim=0)  # [6]
+        # Summarize attention over image sequence
+        text_relevance_scores = attention_weights.sum(dim=2)  # [batch_size, text_len]
 
-        # Extract the top 6 images
-        top_images = image_tensor[topk_indices]  # [6, 256]
-        # Extract the top 6 frames from the image tensor
-        # Gather operation to fetch the top frames
-        print(top_images.shape)
-        top_frames = torch.gather(top_images, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [6, xt,1024]
+        # Combine image and text relevance scores
+        # Normalize the scores to ensure fair weighting
+        normalized_image_relevance = image_relevance_scores / image_relevance_scores.sum(dim=1, keepdim=True)  # [batch_size, image_len]
+        normalized_text_relevance = text_relevance_scores / text_relevance_scores.sum(dim=1, keepdim=True)  # [batch_size, text_len]
+
+        # Compute combined relevance scores
+        combined_relevance_scores = normalized_image_relevance.mean(dim=1, keepdim=True) + normalized_text_relevance.mean(dim=1, keepdim=True)  # [batch_size, 1]
+
+        # Use combined relevance to select top-k frames
+        k = 6
+        topk_values, topk_indices = torch.topk(image_relevance_scores, k=k, dim=1)  # [batch_size, k]
+
+        # Extract top-k frames
+        batch_indices = torch.arange(image_tensor.size(0)).unsqueeze(-1).expand(-1, k)  # [batch_size, k]
+        top_frames = image_tensor[batch_indices, topk_indices]  # [batch_size, k, feature_dim]
+        print("not null: ",top_frames.shape)
+
     else:
         indices = torch.randperm(10)[:6]
         top_frames = image_tensor[indices]    
-    
-    print(top_frames.shape)
+        print("null: ",top_frames.shape)
+
     return top_frames
 
 
