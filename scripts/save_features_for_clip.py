@@ -96,10 +96,10 @@ def cross_attention(image_tensor, text_tensor,null_flag):
     image_tensor = image_tensor.float().cuda()
     output, attention_weights = mha(query=text_tensor, key=image_tensor, value=image_tensor)
     print(attention_weights.shape)
-    # attn = torch.flatten(attention_weights, -2, -1)
+    attention_weights = torch.flatten(attention_weights, -2, -1)
     print(attention_weights.sum(dim=1))
-    print(f"Mean: {attention_weights.mean().item()}")
-    print(f"Std: {attention_weights.std().item()}")
+    # print(f"Mean: {attention_weights.mean().item()}")
+    # print(f"Std: {attention_weights.std().item()}")
     exit()
 
     return output
