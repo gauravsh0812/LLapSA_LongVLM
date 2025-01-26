@@ -119,10 +119,10 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
         
         # Scaled Dot-Product Attention
         attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [batch_size, text_len, image_len]
-        attention_weights = torch.softmax(attention_scores, dim=-1)  # [batch_size, text_len, image_len]
+        # attention_weights = torch.softmax(attention_scores, dim=-1)  # [batch_size, text_len, image_len]
 
         # Summarize attention over text sequence
-        image_relevance_scores = attention_weights.sum(dim=1)  # [batch_size, image_len]
+        image_relevance_scores = attention_scores.sum(dim=1)  # [batch_size, image_len]
         print(image_relevance_scores)
         print(image_relevance_scores.sum(dim=1))
         # topk_values, topk_indices = torch.topk(image_relevance_scores, k=6, dim=1)  # [batch_size, k]
