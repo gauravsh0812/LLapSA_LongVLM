@@ -81,7 +81,7 @@ def cross_attention(image_tensor, text_tensor,null_flag):
     
     # Define dimensions
     hidden_dim = image_tensor.shape[-1]
-    num_heads = 4
+    num_heads = 2
 
     text_tensor = text_tensor.repeat_interleave(repeats=10, dim=0)  # Shape [10, 1, 1024]
 
