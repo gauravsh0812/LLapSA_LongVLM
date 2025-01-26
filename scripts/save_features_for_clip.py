@@ -11,7 +11,7 @@ from transformers import BertTokenizer, BertModel, BertConfig
 from transformers import CLIPVisionModel, CLIPImageProcessor
 from longvlm.model.merge import merge_tokens
 
-torch.set_printoptions(profile="full")
+# torch.set_printoptions(profile="full")
 
 def parse_args():
     parser = argparse.ArgumentParser(description="getting text fragments")
