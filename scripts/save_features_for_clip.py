@@ -109,7 +109,7 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
     if text_tensor.shape[0] != image_tensor.shape[0]:
         text_tensor = text_tensor.repeat(image_tensor.shape[0], 1, 1)
     
-    if null_flag:
+    if not null_flag:
         # Compute Q, K, and V for cross-attention
         Q = text_tensor  # Query
         K = image_tensor  # Key
@@ -117,11 +117,11 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
         d_k = feature_dim
         
         # Compute attention scores
-        attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [10, 141, 256]
-        attention_weights = torch.softmax(attention_scores, dim=-1)  # [10, 141, 256]
+        attention_scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)  # [10, xt, 256]
+        attention_weights = torch.softmax(attention_scores, dim=-1)  # [10, xt, 256]
         
         # Summarize attention over text sequence
-        frame_scores = attention_weights.sum(dim=1)  # [10, 256]
+        frame_scores = attention_weights.sum(dim=2)  # [10, xt]
 
         # Get the top 6 images based on their scores
         topk_values, topk_indices = torch.topk(frame_scores, k=6, dim=0)  # [6]
@@ -131,7 +131,7 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
         # Extract the top 6 frames from the image tensor
         # Gather operation to fetch the top frames
         print(top_images.shape)
-        top_frames = torch.gather(top_images, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [6, 256,1024]
+        top_frames = torch.gather(top_images, dim=1, index=topk_indices.unsqueeze(-1).expand(-1, -1, feature_dim))  # [6, xt,1024]
     else:
         indices = torch.randperm(10)[:6]
         top_frames = image_tensor[indices]    
