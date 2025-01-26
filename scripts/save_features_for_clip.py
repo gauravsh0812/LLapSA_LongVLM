@@ -129,6 +129,8 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
         # Normalize the scores to ensure fair weighting
         normalized_image_relevance = image_relevance_scores / image_relevance_scores.sum(dim=1, keepdim=True)  # [batch_size, image_len]
         normalized_text_relevance = text_relevance_scores / text_relevance_scores.sum(dim=1, keepdim=True)  # [batch_size, text_len]
+        print(normalized_image_relevance)
+        exit()
 
         # Compute combined relevance scores
         combined_relevance_scores = normalized_image_relevance.mean(dim=1, keepdim=True) + normalized_text_relevance.mean(dim=1, keepdim=True)  # [batch_size, 1]
