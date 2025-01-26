@@ -132,7 +132,7 @@ def cross_attention(image_tensor, text_tensor, null_flag=False):
 
         # Compute combined relevance scores
         combined_relevance_scores = normalized_image_relevance.mean(dim=1, keepdim=True) + normalized_text_relevance.mean(dim=1, keepdim=True)  # [batch_size, 1]
-
+        print(combined_relevance_scores)
         # Use combined relevance to select top-k frames
         k = 6
         topk_values, topk_indices = torch.topk(image_relevance_scores, k=k, dim=1)  # [batch_size, k]
