@@ -99,6 +99,8 @@ def cross_attention(image_tensor, text_tensor,null_flag):
     attn = torch.flatten(attention_weights, -2, -1)
     print(attn.shape)
     print(attn.sum(dim=1))
+    print(f"Mean: {attn.mean().item()}")
+    print(f"Std: {attn.std().item()}")
     exit()
     return output
 
