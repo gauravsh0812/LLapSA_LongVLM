@@ -77,7 +77,7 @@ def split_tensor(tnsr):
         sub_tensors.append(sub_tensor)
     return sub_tensors
 
-def cross_attention(image_tensor, text_tensor,):
+def cross_attention(image_tensor, text_tensor,null_flag):
     
     # Define dimensions
     hidden_dim = image_tensor.shape[-1]
