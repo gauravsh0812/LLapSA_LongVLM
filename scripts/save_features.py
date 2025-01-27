@@ -61,8 +61,8 @@ class SiglipVisionTower(BaseVisionTower):
 def reduce_similar_frames(visual_emb_frame):
     
     "https://github.com/Vision-CAIR/LongVU/blob/1ca42869fd456ecfef8acdc2aaa01e43864431e0/longvu/cambrian_arch.py#L1474"
-
-    assert visual_emb_frame.shape[0] // 5 == 0, "num frames should be multiple of 5!"
+    
+    assert visual_emb_frame.shape[0] % 5 == 0, "num frames should be multiple of 5!"
     
     max_visual_len = 30
 
