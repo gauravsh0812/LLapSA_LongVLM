@@ -79,6 +79,7 @@ def reduce_similar_frames(embeddings, window_size=5, similarity_threshold=0.8):
         window_embeddings = embeddings[start:end]
         
         # Compute cosine similarity matrix for the window
+        window_embeddings = window_embeddings.cpu().numpy()
         similarity_matrix = cosine_similarity(window_embeddings)
         
         # Calculate average similarity for each frame in the window
