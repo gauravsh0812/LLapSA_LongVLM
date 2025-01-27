@@ -105,6 +105,8 @@ def reduce_similar_frames(visual_emb_frame):
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
     else:
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
+    
+    return new_visual_emb_frames
 
 def get_spatio_temporal_features(features, num_temporal_tokens=20):
     t, s, c = features.shape
