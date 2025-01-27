@@ -1,5 +1,6 @@
 import os 
 import numpy as np
+import math
 import torch
 import tqdm
 import pickle
@@ -57,45 +58,53 @@ class SiglipVisionTower(BaseVisionTower):
             ).hidden_states[-1]
             return image_features
 
+def reduce_similar_frames(visual_emb_frame):
+    
+    "https://github.com/Vision-CAIR/LongVU/blob/1ca42869fd456ecfef8acdc2aaa01e43864431e0/longvu/cambrian_arch.py#L1474"
 
-def reduce_similar_frames(embeddings, window_size=5, similarity_threshold=0.8):
-    """
-    Eliminate frames with high average similarity within a sliding window.
+    assert len(visual_emb_frame) // 5 == 0, "num frames should be multiple of 5!"
     
-    Args:
-        embeddings (numpy.ndarray): A 2D array where each row is an embedding vector.
-        window_size (int): Number of frames in each window (J in the formula).
-        similarity_threshold (float): Threshold for average similarity to reduce frames.
-        
-    Returns:
-        list: Indices of frames to keep.
-    """
-    num_frames = len(embeddings)
-    to_keep = []
-    
-    for start in range(0, num_frames, window_size):
-        # Select window
-        end = min(start + window_size, num_frames)
-        window_embeddings = embeddings[start:end]
-        
-        # Compute cosine similarity matrix for the window
-        print(window_embeddings.shape)
-        window_embeddings = window_embeddings.view(window_embeddings.shape[0], -1)
-        window_embeddings = window_embeddings.cpu().numpy()
-        similarity_matrix = cosine_similarity(window_embeddings)
-        np.fill_diagonal(similarity_matrix, 0) # Ignore self-similarity
-        
-        # Calculate average similarity for each image
-        avg_similarity = np.mean(similarity_matrix, axis=1)
-        print(avg_similarity)
-        
-        # Select images with average similarity below the threshold
-        to_keep_indices = np.where(avg_similarity < similarity_threshold)[0]
-        to_keep.append(to_keep_indices)
-    
-    print("to keep: ", to_keep)
-    
-    # return embeddings[to_keep]
+    max_visual_len = 30
+
+    new_visual_emb_frames = []
+
+    for start_idx in range(0, len(visual_emb_frame), 5):
+        end_idx = min(start_idx + 5, len(visual_emb_frame))
+        chunk_feature = visual_emb_frame[start_idx:end_idx]  # 5, HW, C
+        if len(chunk_feature) == 1:
+            new_visual_emb_frames.append(chunk_feature[0])
+            continue
+
+        sim = F.cosine_similarity(
+            chunk_feature[0]
+            .unsqueeze(0)
+            .repeat_interleave(len(chunk_feature[1:]), dim=0),
+            chunk_feature[1:],
+            dim=-1,
+        )
+        new_visual_emb_frame = torch.cat(
+            [
+                chunk_feature[0],
+                chunk_feature[1:].flatten(0, 1)[sim.flatten(0, 1) < 0.7],
+            ],
+            dim=0,
+        )
+        new_visual_emb_frames.append(new_visual_emb_frame)
+
+    reduced_visual_len = sum([x.shape[0] for x in new_visual_emb_frames])
+
+    if reduced_visual_len > max_visual_len:
+        force_remove = math.ceil(
+            (reduced_visual_len - max_visual_len)
+            / len(new_visual_emb_frames)
+        )
+        for chunk_i in range(len(new_visual_emb_frames)):
+            new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][
+                :-force_remove
+            ]
+        new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
+    else:
+        new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
 
 def get_spatio_temporal_features(features, num_temporal_tokens=20):
     t, s, c = features.shape
