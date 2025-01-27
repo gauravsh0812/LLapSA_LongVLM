@@ -67,8 +67,6 @@ def reduce_similar_frames(visual_emb_frame):
     new_visual_emb_frames = []
     max_visual_len = 256*50  # keeping 50% frames
 
-    short_flag = False
-
     for start_idx in range(0, len(visual_emb_frame), 5):
         end_idx = min(start_idx + 5, len(visual_emb_frame))
         chunk_feature = visual_emb_frame[start_idx:end_idx]  # 5, HW, C
@@ -103,10 +101,13 @@ def reduce_similar_frames(visual_emb_frame):
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
         
     else:
-        short_flag = True
-        new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
+        # if the video is shorter, keep it intact
+        # we would not extract key frames rather just take the 50% alternate frames
+        step = 2
+        new_visual_emb_frames = visual_emb_frame[::step, :, :]  # Slicing to get [50, :, :]
+        new_visual_emb_frames = new_visual_emb_frames.flatten(0,1)
     
-    return new_visual_emb_frames, short_flag
+    return new_visual_emb_frames
 
 def get_spatio_temporal_features(features, num_temporal_tokens=20):
     t, s, c = features.shape
@@ -131,14 +132,13 @@ def process_dino_and_vcgpt_files(x, y):
     output_path = args.output_path
 
     # Load pickled tensors
-    count = 0
     for file in tqdm.tqdm(dino_files, total=len(dino_files)):
         # if not os.path.exists(f"{output_path}/{file}"):
         #     try:
-        dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:, 1:]
-        reduced_tensor, short_flag = reduce_similar_frames(dino_tensors) 
-        if short_flag:
-            count+=1
+        dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:]
+        reduced_tensor = reduce_similar_frames(dino_tensors) 
+        
+            
 
         # print(reduced_tensor.shape)
         # exit()
