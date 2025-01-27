@@ -65,7 +65,7 @@ def reduce_similar_frames(visual_emb_frame):
     assert visual_emb_frame.shape[0] % 5 == 0, "num frames should be multiple of 5!"
 
     new_visual_emb_frames = []
-    max_visual_len = 2048
+    max_visual_len = 256*50
 
     for start_idx in range(0, len(visual_emb_frame), 5):
         end_idx = min(start_idx + 5, len(visual_emb_frame))
@@ -88,7 +88,7 @@ def reduce_similar_frames(visual_emb_frame):
         new_visual_emb_frames.append(new_visual_emb_frame)
 
     reduced_visual_len = sum([x.shape[0] for x in new_visual_emb_frames])
-    print(reduced_visual_len)
+    
     if reduced_visual_len > max_visual_len:
         force_remove = math.ceil(
             (reduced_visual_len - max_visual_len)
@@ -101,6 +101,7 @@ def reduce_similar_frames(visual_emb_frame):
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
         
     else:
+        print(reduced_visual_len)
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
     
     # print(new_visual_emb_frames.shape)
