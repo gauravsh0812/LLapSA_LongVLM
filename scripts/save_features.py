@@ -99,6 +99,7 @@ def reduce_similar_frames(visual_emb_frame):
                 :-force_remove
             ]
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
+        print(new_visual_emb_frames.shape)
     else:
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
     
@@ -133,7 +134,7 @@ def process_dino_and_vcgpt_files(x, y):
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:, 1:]
         # print(dino_tensors.shape)
         reduced_tensor = reduce_similar_frames(dino_tensors) 
-        print(reduced_tensor.shape)
+        # print(reduced_tensor.shape)
         # exit()
         # spatial_tokens = get_spatio_temporal_features(reduced_tensor)
         # print(spatial_tokens.shape)
