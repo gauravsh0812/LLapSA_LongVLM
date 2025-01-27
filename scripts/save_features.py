@@ -90,6 +90,8 @@ def reduce_similar_frames(visual_emb_frame):
             dim=0,
         )
         new_visual_emb_frames.append(new_visual_emb_frame)
+        print("new shape: ", new_visual_emb_frame.shape)
+
 
     reduced_visual_len = sum([x.shape[0] for x in new_visual_emb_frames])
 
