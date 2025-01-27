@@ -82,8 +82,8 @@ def reduce_similar_frames(visual_emb_frame):
             chunk_feature[1:],
             dim=-1,
         )
-        print("chunk_feature[0]: ", chunk_feature[0].unsqueeze(0).repeat_interleave(len(chunk_feature[1:])).shape)
-        print("chunk feature[1:].flatten: ", chunk_feature[1:].flatten(0, 1).shape)
+        print("chunk_feature[0]: ", chunk_feature[0].unsqueeze(0).repeat_interleave(len(chunk_feature[1:]), dim=0).shape)
+        # print("chunk feature[1:].flatten: ", chunk_feature[1:].flatten(0, 1).shape)
         new_visual_emb_frame = torch.cat(
             [chunk_feature[0],chunk_feature[1:].flatten(0, 1)[sim.flatten(0, 1) < 0.7]],
             dim=0,
