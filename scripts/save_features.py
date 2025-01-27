@@ -94,15 +94,17 @@ def reduce_similar_frames(visual_emb_frame):
             (reduced_visual_len - max_visual_len)
             / len(new_visual_emb_frames)
         )
+        print(force_remove)
         for chunk_i in range(len(new_visual_emb_frames)):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][
                 :-force_remove
             ]
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
-        print(new_visual_emb_frames.shape)
+        
     else:
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
     
+    print(new_visual_emb_frames.shape)
     return new_visual_emb_frames
 
 def get_spatio_temporal_features(features, num_temporal_tokens=20):
