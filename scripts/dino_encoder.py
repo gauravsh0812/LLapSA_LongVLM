@@ -7,10 +7,10 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 from decord import VideoReader, cpu
-from transformers import AutoImageProcessor, Dinov2Model
+from transformers import AutoImageProcessor, Dinov2Model, Dinov2Config
     
 
-def load_video(vis_path, num_frm=100):
+def load_video(vis_path, num_frm=60):
     vr = VideoReader(vis_path, ctx=cpu(0))
     total_frame_num = len(vr)
     total_num_frm = min(total_frame_num, num_frm)
@@ -76,10 +76,13 @@ class DinoFeatureExtractor:
             device (str): Device to run the model on ('cuda' or 'cpu').
         """
         self.device = device
+        configuration = Dinov2Config.from_pretrained(model_name)
+        configuration.hidden_size = 1024
         self.processor = AutoImageProcessor.from_pretrained(model_name, torch_dtype=torch.float16)
-        self.model = Dinov2Model.from_pretrained(model_name, torch_dtype=torch.float16, 
-                                                 low_cpu_mem_usage=True).to(self.device)
-        # self.model.half()
+        self.model = Dinov2Model(configuration, low_cpu_mem_usage=True, 
+                                torch_dtype=torch.float16, ).to(self.device)
+        # self.model = Dinov2Model.from_pretrained(model_name, torch_dtype=torch.float16, 
+        #                                          low_cpu_mem_usage=True).to(self.device)
         self.model.eval()
 
     def extract_features(self, frames, layer_index=-2):
@@ -122,23 +125,13 @@ def main():
     vcgpt_features = os.path.join(clip_feat_path, "dino_features")
     os.makedirs(vcgpt_features, exist_ok=True)
 
-    # xy = args.xy
-    # x,y = xy.split("-")
-    # x = int(x)
-    # y = int(y)
-
     # Initialize the DinoV2 model    
     all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i]
-    # if y!="end":
-    #     all_videos = all_videos[x:y]
-    # else:
-    # all_videos = all_videos[x:]
     
     dino = DinoFeatureExtractor()
 
     video_clip_features = {}
     counter = 0
-    # batch_size = 20
 
     for video_name in tqdm(all_videos):
         video_path = f"{video_dir_path}/{video_name}"
@@ -146,17 +139,9 @@ def main():
         if os.path.exists(f"{vcgpt_features}/{video_id}.pkl"):
             continue
         try:
-        # print(video_path)
             frames = load_video(video_path)
-            # print("length of frames: ", len(frames))
-            # farr = []
-            # for i in range(0, len(frames), batch_size):
             preprocessed_frames = dino.preprocess_frames(frames)
             features = dino.extract_features(preprocessed_frames, layer_index=-2)
-            # farr.append(features)
-            # print(features.shape)
-            # features = torch.cat(farr, dim=0)
-            # print("final: ", features.shape)
             video_clip_features[video_id] = features
             counter += 1       
             

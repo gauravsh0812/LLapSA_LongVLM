@@ -80,21 +80,21 @@ def reduce_similar_frames(embeddings, window_size=5, similarity_threshold=0.8):
         
         # Compute cosine similarity matrix for the window
         print(window_embeddings.shape)
+        window_embeddings = window_embeddings.view(window_embeddings.shape[0], -1)
         window_embeddings = window_embeddings.cpu().numpy()
         similarity_matrix = cosine_similarity(window_embeddings)
+        np.fill_diagonal(similarity_matrix, 0) # Ignore self-similarity
         
-        # Calculate average similarity for each frame in the window
-        avg_similarity = []
-        for i in range(len(window_embeddings)):
-            avg_sim = np.mean(similarity_matrix[i][np.arange(len(window_embeddings)) != i])
-            avg_similarity.append(avg_sim)
+        # Calculate average similarity for each image
+        avg_similarity = np.mean(similarity_matrix, axis=1)
         
-        # Filter frames with average similarity below the threshold
-        for i, sim in enumerate(avg_similarity):
-            if sim < similarity_threshold:
-                to_keep.append(start + i)  # Global index of the frame
+        # Select images with average similarity below the threshold
+        to_keep_indices = np.where(avg_similarity < similarity_threshold)[0]
+        to_keep.append(to_keep_indices)
     
-    return to_keep
+    print("to keep: ", to_keep)
+    
+    # return embeddings[to_keep]
 
 def get_spatio_temporal_features(features, num_temporal_tokens=20):
     t, s, c = features.shape
