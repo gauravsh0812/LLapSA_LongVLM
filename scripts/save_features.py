@@ -65,7 +65,7 @@ def reduce_similar_frames(visual_emb_frame):
     assert visual_emb_frame.shape[0] % 5 == 0, "num frames should be multiple of 5!"
 
     new_visual_emb_frames = []
-    max_visual_len = 256*50
+    max_visual_len = 256*50  # keeping 50% frames
 
     for start_idx in range(0, len(visual_emb_frame), 5):
         end_idx = min(start_idx + 5, len(visual_emb_frame))
@@ -101,7 +101,6 @@ def reduce_similar_frames(visual_emb_frame):
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
         
     else:
-        print(reduced_visual_len)
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
     
     # print(new_visual_emb_frames.shape)
@@ -134,7 +133,6 @@ def process_dino_and_vcgpt_files(x, y):
         # if not os.path.exists(f"{output_path}/{file}"):
         #     try:
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:, 1:]
-        # print(dino_tensors.shape)
         reduced_tensor = reduce_similar_frames(dino_tensors) 
         # print(reduced_tensor.shape)
         # exit()
