@@ -137,10 +137,8 @@ def process_dino_and_vcgpt_files(x, y):
         #     try:
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:]
         reduced_tensor = reduce_similar_frames(dino_tensors) 
+        print(reduced_tensor.shape)
         
-            
-
-        # print(reduced_tensor.shape)
         # exit()
         # spatial_tokens = get_spatio_temporal_features(reduced_tensor)
         # print(spatial_tokens.shape)
@@ -152,7 +150,7 @@ def process_dino_and_vcgpt_files(x, y):
         #     pickle.dump(spatial_tokens, f)
             # except:
             #     print(f"{file} doesn't work!")
-    print(count)
+        
 if __name__ == "__main__":
     args = parse_args()
     x, y = args.xy.split("-")
