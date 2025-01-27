@@ -152,7 +152,7 @@ def process_dino_and_vcgpt_files(x, y):
         #     pickle.dump(spatial_tokens, f)
             # except:
             #     print(f"{file} doesn't work!")
-
+    print(count)
 if __name__ == "__main__":
     args = parse_args()
     x, y = args.xy.split("-")
