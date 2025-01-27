@@ -63,10 +63,9 @@ def reduce_similar_frames(visual_emb_frame):
     "https://github.com/Vision-CAIR/LongVU/blob/1ca42869fd456ecfef8acdc2aaa01e43864431e0/longvu/cambrian_arch.py#L1474"
     
     assert visual_emb_frame.shape[0] % 5 == 0, "num frames should be multiple of 5!"
-    
-    max_visual_len = 30
 
     new_visual_emb_frames = []
+    max_visual_len = 2048
 
     for start_idx in range(0, len(visual_emb_frame), 5):
         end_idx = min(start_idx + 5, len(visual_emb_frame))
@@ -82,16 +81,11 @@ def reduce_similar_frames(visual_emb_frame):
             chunk_feature[1:],
             dim=-1,
         )
-        print("sim: ", sim)
-        # print("chunk_feature[0]: ", chunk_feature[0].unsqueeze(0).repeat_interleave(len(chunk_feature[1:]), dim=0).shape)
-        # print("chunk feature[1:].flatten: ", chunk_feature[1:].flatten(0, 1).shape)
         new_visual_emb_frame = torch.cat(
             [chunk_feature[0],chunk_feature[1:].flatten(0, 1)[sim.flatten(0, 1) < 0.7]],
             dim=0,
         )
         new_visual_emb_frames.append(new_visual_emb_frame)
-        print("new shape: ", new_visual_emb_frame.shape)
-
 
     reduced_visual_len = sum([x.shape[0] for x in new_visual_emb_frames])
 
@@ -137,18 +131,18 @@ def process_dino_and_vcgpt_files(x, y):
         # if not os.path.exists(f"{output_path}/{file}"):
         #     try:
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:, 1:]
-        print(dino_tensors.shape)
-        reduced_tensor = reduce_similar_frames(dino_tensors) # (20, 256, 1024)
+        # print(dino_tensors.shape)
+        reduced_tensor = reduce_similar_frames(dino_tensors) 
         print(reduced_tensor.shape)
-        exit()
-        spatial_tokens = get_spatio_temporal_features(reduced_tensor)
+        # exit()
+        # spatial_tokens = get_spatio_temporal_features(reduced_tensor)
         # print(spatial_tokens.shape)
         # siglip_tensor = siglip(reduced_tensor)
         # siglip_tensor_np = siglip_tensor.numpy()
         # spatial_tokens = torch.mean(reduced_tensor, dim=0).detach().numpy()
         # print(spatial_tokens.shape)
-        with open(f"{output_path}/{file}", 'wb') as f:
-            pickle.dump(spatial_tokens, f)
+        # with open(f"{output_path}/{file}", 'wb') as f:
+        #     pickle.dump(spatial_tokens, f)
             # except:
             #     print(f"{file} doesn't work!")
 

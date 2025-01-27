@@ -105,8 +105,6 @@ def merge_tokens(x, r_merge_list=[1280, 640, 320, 160, 80, 40, 10], clips=10):
     x = x.reshape(-1, c)  # 300, 1024
     return x
 
-
-
 if __name__ == "__main__":
     x = torch.randn(100, 256, 768)
     x = merge_tokens(x)
