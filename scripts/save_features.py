@@ -87,6 +87,7 @@ def reduce_similar_frames(embeddings, window_size=5, similarity_threshold=0.8):
         
         # Calculate average similarity for each image
         avg_similarity = np.mean(similarity_matrix, axis=1)
+        print(avg_similarity)
         
         # Select images with average similarity below the threshold
         to_keep_indices = np.where(avg_similarity < similarity_threshold)[0]
