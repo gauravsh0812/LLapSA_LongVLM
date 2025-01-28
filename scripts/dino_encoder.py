@@ -46,7 +46,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Training")
     parser.add_argument("--video_dir_path", required=True, help="Path to read the videos from.")
     parser.add_argument("--clip_feat_path", required=True, help="The output dir to save the features in.")
-    # parser.add_argument("--xy", required=True)
+    parser.add_argument("--xy", required=True)
     args = parser.parse_args()
     return args
 
@@ -125,7 +125,8 @@ def main():
     os.makedirs(vcgpt_features, exist_ok=True)
 
     # Initialize the DinoV2 model    
-    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][1000:]
+    x,y = args.xy.split("-")
+    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][int(x):int(y)]
     
     dino = DinoFeatureExtractor()
 
