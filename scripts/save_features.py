@@ -103,8 +103,6 @@ def reduce_similar_frames(visual_emb_frame):
         for chunk_i in range(len(new_visual_emb_frames)):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-force_remove]
 
-        print(new_visual_emb_frames.shape)
-
         # extra removal
         for _ in range(int(factor)):
             chunk_i = random.randint(0, len(new_visual_emb_frames) - 1)
