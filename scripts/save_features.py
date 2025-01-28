@@ -169,10 +169,12 @@ def process_dino_and_vcgpt_files(x, y):
         # print("reduced: ", reduced_tensor.shape)
         reduced_tensors.append(reduced_tensor)
     
-    siglip_input = torch.cat(reduced_tensors, dim=0)
-    print(siglip_input.shape)
-    siglip_tensor = siglip(siglip_input)
-    print(siglip_tensor.shape)
+    from torch.cuda.amp import autocast
+    with autocast():
+        siglip_input = torch.cat(reduced_tensors, dim=0)
+        print(siglip_input.shape)
+        siglip_tensor = siglip(siglip_input)
+        print(siglip_tensor.shape)
         
 if __name__ == "__main__":
     args = parse_args()
