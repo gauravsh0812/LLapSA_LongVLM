@@ -110,9 +110,9 @@ def reduce_similar_frames(visual_emb_frame):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-1]
         
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
-        print(new_visual_emb_frames.shape)
-        print("===="*4)
-
+        if new_visual_emb_frames.shape[0] > 12800:
+            print(new_visual_emb_frames.shape)
+        
     else:
         # if the video is shorter, keep it intact
         # we would not extract key frames rather just take the 50% alternate frames
