@@ -169,7 +169,7 @@ def process_dino_and_vcgpt_files(x, y):
         
 
         siglip_tensor = siglip(reduced_tensor)
-        print(siglip_tensor)
+        print(siglip_tensor.shape)
         
 if __name__ == "__main__":
     args = parse_args()
