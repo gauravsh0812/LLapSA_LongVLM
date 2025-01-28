@@ -1,6 +1,7 @@
 import os 
 import numpy as np
 import math
+import random
 import torch
 import tqdm
 import pickle
@@ -62,13 +63,14 @@ def reduce_similar_frames(visual_emb_frame):
     
     "https://github.com/Vision-CAIR/LongVU/blob/1ca42869fd456ecfef8acdc2aaa01e43864431e0/longvu/cambrian_arch.py#L1474"
     
-    assert visual_emb_frame.shape[0] % 5 == 0, "num frames should be multiple of 5!"
+    window_size = 5
+    assert visual_emb_frame.shape[0] % window_size == 0, "num frames should be multiple of 5!"
 
     new_visual_emb_frames = []
-    max_visual_len = 256*50  # keeping 50% frames
+    max_visual_len = visual_emb_frame.shape[1] * (visual_emb_frame.shape[0]/2)  # keeping 50% frames
 
     for start_idx in range(0, len(visual_emb_frame), 5):
-        end_idx = min(start_idx + 5, len(visual_emb_frame))
+        end_idx = min(start_idx + window_size, len(visual_emb_frame))
         chunk_feature = visual_emb_frame[start_idx:end_idx]  # 5, HW, C
         if len(chunk_feature) == 1:
             new_visual_emb_frames.append(chunk_feature[0])
@@ -90,14 +92,21 @@ def reduce_similar_frames(visual_emb_frame):
     reduced_visual_len = sum([x.shape[0] for x in new_visual_emb_frames])
     
     if reduced_visual_len > max_visual_len:
+        factor = (reduced_visual_len - max_visual_len) % len(new_visual_emb_frames)
         force_remove = math.ceil(
-            (reduced_visual_len - max_visual_len)
+            (reduced_visual_len - max_visual_len - factor)
             / len(new_visual_emb_frames)
         )
+        # force removal 
         for chunk_i in range(len(new_visual_emb_frames)):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][
                 :-force_remove
-            ]
+        ]
+        # extra removal
+        for _ in range(factor):
+            chunk_i = random.randint(0, len(new_visual_emb_frames) - 1)
+            new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-1]
+        
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
         
     else:
