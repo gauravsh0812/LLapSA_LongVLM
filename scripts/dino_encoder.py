@@ -125,7 +125,7 @@ def main():
     os.makedirs(vcgpt_features, exist_ok=True)
 
     # Initialize the DinoV2 model    
-    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][:1000]
+    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][1000:]
     
     dino = DinoFeatureExtractor()
 
