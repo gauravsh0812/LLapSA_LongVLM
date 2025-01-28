@@ -157,6 +157,7 @@ def process_dino_and_vcgpt_files(x, y):
     siglip = SiglipVisionTower()
 
     # Load pickled tensors
+    reduced_tensors = []
     for file in tqdm.tqdm(dino_files, total=len(dino_files)):
         # if not os.path.exists(f"{output_path}/{file}"):
         #     try:
@@ -166,10 +167,12 @@ def process_dino_and_vcgpt_files(x, y):
         # print("reduced: ", reduced_tensor.shape)
         reduced_tensor = reduced_tensor.unsqueeze(1).repeat(1, 3, 1, 1)
         # print("reduced: ", reduced_tensor.shape)
-        
-
-        siglip_tensor = siglip(reduced_tensor)
-        print(siglip_tensor.shape)
+        reduced_tensors.append(reduced_tensor)
+    
+    siglip_input = torch.stack(reduced_tensors, dim=0)
+    print(siglip_input.shape)
+    siglip_tensor = siglip(siglip_input)
+    print(siglip_tensor.shape)
         
 if __name__ == "__main__":
     args = parse_args()
