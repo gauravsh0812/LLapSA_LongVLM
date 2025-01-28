@@ -98,6 +98,7 @@ def reduce_similar_frames(visual_emb_frame):
             / len(new_visual_emb_frames)
         )
         print(factor, force_remove)
+        print(reduced_visual_len, max_visual_len, reduced_visual_len - max_visual_len)
 
         # force removal 
         for chunk_i in range(len(new_visual_emb_frames)):
