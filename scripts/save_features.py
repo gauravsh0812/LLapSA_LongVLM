@@ -161,15 +161,15 @@ def process_dino_and_vcgpt_files(x, y):
         # if not os.path.exists(f"{output_path}/{file}"):
         #     try:
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:,:]
-        print("dino: ", dino_tensors.shape)
+        # print("dino: ", dino_tensors.shape)
         reduced_tensor = reduce_similar_frames(dino_tensors) # (60, 256, 1024)
-        print("reduced: ", reduced_tensor.shape)
+        # print("reduced: ", reduced_tensor.shape)
         reduced_tensor = reduced_tensor.unsqueeze(1).repeat(1, 3, 1, 1)
-        print("reduced: ", reduced_tensor.shape)
+        # print("reduced: ", reduced_tensor.shape)
         
 
-        # siglip_tensor = siglip(reduced_tensor.unsqueeze(0))
-        # print(siglip_tensor)
+        siglip_tensor = siglip(reduced_tensor)
+        print(siglip_tensor)
         
 if __name__ == "__main__":
     args = parse_args()
