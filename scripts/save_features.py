@@ -158,7 +158,11 @@ def process_dino_and_vcgpt_files(x, y):
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:,:]
         print("dino: ", dino_tensors.shape)
         reduced_tensor = reduce_similar_frames(dino_tensors) # (15360, 1024)
+        reduced_tensor = reduced_tensor.view(reduced_tensor.shape[0]/reduced_tensor.shape[1],
+                                             reduced_tensor.shape[1],
+                                             reduced_tensor.shape[-1])
         print("reduced: ", reduced_tensor.shape)
+
         siglip_tensor = siglip(reduced_tensor)
         print(siglip_tensor)
 
