@@ -98,12 +98,13 @@ def reduce_similar_frames(visual_emb_frame):
             / len(new_visual_emb_frames)
         )
         print(factor, force_remove)
-        
+
         # force removal 
         for chunk_i in range(len(new_visual_emb_frames)):
-            new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][
-                :-force_remove
-        ]
+            new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-force_remove]
+
+        print(new_visual_emb_frames.shape)
+
         # extra removal
         for _ in range(int(factor)):
             chunk_i = random.randint(0, len(new_visual_emb_frames) - 1)
@@ -111,6 +112,7 @@ def reduce_similar_frames(visual_emb_frame):
         
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
         print(new_visual_emb_frames.shape)
+        print("===="*4)
 
     else:
         # if the video is shorter, keep it intact
