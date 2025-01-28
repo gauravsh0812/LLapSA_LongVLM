@@ -79,7 +79,7 @@ class DinoFeatureExtractor:
         configuration = Dinov2Config.from_pretrained(model_name)
         configuration.hidden_size = 1024
         self.processor = AutoImageProcessor.from_pretrained(model_name, torch_dtype=torch.float16)
-        self.model = Dinov2Model(configuration).to(self.device).half()
+        self.model = Dinov2Model(configuration).to(self.device)
         self.model.eval()
 
     def extract_features(self, frames, layer_index=-2):
@@ -139,7 +139,7 @@ def main():
             frames = load_video(video_path)
             preprocessed_frames = dino.preprocess_frames(frames)
             features = dino.extract_features(preprocessed_frames, layer_index=-2)
-            video_clip_features[video_id] = features
+            video_clip_features[video_id] = features.half()
             counter += 1       
             
         except Exception as e:
