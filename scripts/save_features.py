@@ -147,6 +147,8 @@ def process_dino_and_vcgpt_files(x, y):
     dino_files = os.listdir(dino_path)[x:y]
     output_path = args.output_path
 
+    print("dino path: ", dino_path)
+
     siglip = SiglipVisionTower()
 
     # Load pickled tensors

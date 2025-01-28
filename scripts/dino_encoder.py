@@ -120,7 +120,8 @@ def main():
 
     args = parse_args()
     video_dir_path = args.video_dir_path
-    vcgpt_features = args.clip_feat_path
+    clip_feat_path = args.clip_feat_path
+    vcgpt_features = os.path.join(clip_feat_path, "dino_features")
     os.makedirs(vcgpt_features, exist_ok=True)
 
     # Initialize the DinoV2 model    
