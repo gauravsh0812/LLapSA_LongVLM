@@ -97,8 +97,6 @@ def reduce_similar_frames(visual_emb_frame):
             (reduced_visual_len - max_visual_len - factor)
             / len(new_visual_emb_frames)
         )
-        print(factor, force_remove)
-        print(reduced_visual_len, max_visual_len, reduced_visual_len - max_visual_len)
 
         # force removal 
         for chunk_i in range(len(new_visual_emb_frames)):
@@ -111,6 +109,8 @@ def reduce_similar_frames(visual_emb_frame):
         
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
         if new_visual_emb_frames.shape[0] > 12800:
+            print(factor, force_remove)
+            print(reduced_visual_len, max_visual_len, reduced_visual_len - max_visual_len)
             print(new_visual_emb_frames.shape)
         
     else:
