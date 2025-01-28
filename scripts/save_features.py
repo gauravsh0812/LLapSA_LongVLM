@@ -104,7 +104,7 @@ def reduce_similar_frames(visual_emb_frame):
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
 
         # extra removal -- factor
-        for _ in range(int(new_visual_emb_frames.shape[0] - max_visual_len)):
+        for _ in range(new_visual_emb_frames.shape[0] - max_visual_len):
             chunk_i = random.randint(0, len(new_visual_emb_frames) - 1)
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-1]
         
