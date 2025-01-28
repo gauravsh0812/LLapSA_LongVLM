@@ -113,11 +113,11 @@ def reduce_similar_frames(visual_emb_frame):
     else:
         # if the video is shorter, keep it intact
         # we would not extract key frames rather just take the 50% alternate frames
-        step = 2
+        step = 3
         new_visual_emb_frames = visual_emb_frame[::step, :, :]  # Slicing to get [50, :, :]
         new_visual_emb_frames = new_visual_emb_frames.flatten(0,1)
     
-    print(new_visual_emb_frames.shape)
+        print(new_visual_emb_frames.shape)
     return new_visual_emb_frames
 
 def get_spatio_temporal_features(features, num_temporal_tokens=20):
