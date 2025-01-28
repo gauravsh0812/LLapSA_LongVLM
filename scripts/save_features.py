@@ -93,7 +93,6 @@ def reduce_similar_frames(visual_emb_frame):
     
     if reduced_visual_len > max_visual_len:
         factor = (reduced_visual_len - max_visual_len) % len(new_visual_emb_frames)
-        print(factor)
         force_remove = math.ceil(
             (reduced_visual_len - max_visual_len - factor)
             / len(new_visual_emb_frames)
@@ -109,6 +108,7 @@ def reduce_similar_frames(visual_emb_frame):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-1]
         
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
+        print(new_visual_emb_frames.shape)
         
     else:
         # if the video is shorter, keep it intact
@@ -147,7 +147,6 @@ def process_dino_and_vcgpt_files(x, y):
         #     try:
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:]
         reduced_tensor = reduce_similar_frames(dino_tensors) 
-        print(reduced_tensor.shape)
         
         # exit()
         # spatial_tokens = get_spatio_temporal_features(reduced_tensor)
