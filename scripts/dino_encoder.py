@@ -10,7 +10,7 @@ from decord import VideoReader, cpu
 from transformers import AutoImageProcessor, Dinov2Model, Dinov2Config
     
 
-def load_video(vis_path, num_frm=60):
+def load_video(vis_path, num_frm=100):
     vr = VideoReader(vis_path, ctx=cpu(0))
     total_frame_num = len(vr)
     total_num_frm = min(total_frame_num, num_frm)
