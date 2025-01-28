@@ -122,6 +122,8 @@ def reduce_similar_frames(visual_emb_frame):
         target_frames = int(total_frames * 0.6)
         indices = torch.linspace(0, total_frames - 1, steps=target_frames).round().long()
         new_visual_emb_frames = visual_emb_frame[indices, :].flatten(0, 1)
+    
+    if new_visual_emb_frames.shape[0] > max_visual_len:
         print(new_visual_emb_frames.shape)
 
     return new_visual_emb_frames
