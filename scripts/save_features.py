@@ -153,7 +153,7 @@ def process_dino_and_vcgpt_files(x, y):
     for file in tqdm.tqdm(dino_files, total=len(dino_files)):
         # if not os.path.exists(f"{output_path}/{file}"):
         #     try:
-        dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:]
+        dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))
         print("dino: ", dino_tensors.shape)
         reduced_tensor = reduce_similar_frames(dino_tensors) # (15360, 1024)
         print("reduced: ", reduced_tensor.shape)
