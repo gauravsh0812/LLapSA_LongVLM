@@ -9,7 +9,7 @@ import argparse
 import multiprocessing as mp
 from sklearn.metrics.pairwise import cosine_similarity
 import torch.nn.functional as F
-from transformers import SiglipImageProcessor, SiglipVisionModel
+from transformers import SiglipImageProcessor, SiglipVisionModel, SiglipVisionConfig
 from scripts.base_encoder import BaseVisionTower
 from longvlm.model.merge import merge_tokens
 
@@ -164,22 +164,12 @@ def process_dino_and_vcgpt_files(x, y):
         print("dino: ", dino_tensors.shape)
         reduced_tensor = reduce_similar_frames(dino_tensors) # (60, 256, 1024)
         print("reduced: ", reduced_tensor.shape)
-
-        siglip_tensor = siglip(reduced_tensor.unsqueeze(0))
-        print(siglip_tensor)
-
+        reduced_tensor = reduced_tensor.unsqueeze(1).repeat(1, 3, 1, 1)
+        print("reduced: ", reduced_tensor.shape)
         
-        # exit()
-        # spatial_tokens = get_spatio_temporal_features(reduced_tensor)
-        # print(spatial_tokens.shape)
-        # siglip_tensor = siglip(reduced_tensor)
-        # siglip_tensor_np = siglip_tensor.numpy()
-        # spatial_tokens = torch.mean(reduced_tensor, dim=0).detach().numpy()
-        # print(spatial_tokens.shape)
-        # with open(f"{output_path}/{file}", 'wb') as f:
-        #     pickle.dump(spatial_tokens, f)
-            # except:
-            #     print(f"{file} doesn't work!")
+
+        # siglip_tensor = siglip(reduced_tensor.unsqueeze(0))
+        # print(siglip_tensor)
         
 if __name__ == "__main__":
     args = parse_args()
