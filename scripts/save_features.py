@@ -100,9 +100,9 @@ def reduce_similar_frames(visual_emb_frame):
 
         # force removal 
         for chunk_i in range(len(new_visual_emb_frames)):
-            print(new_visual_emb_frames[chunk_i].shape)
+            print("before: ", new_visual_emb_frames[chunk_i].shape)
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-force_remove]
-            print(new_visual_emb_frames[chunk_i].shape)
+            print("after: ", new_visual_emb_frames[chunk_i].shape)
         print(torch.cat(new_visual_emb_frames, dim=0).shape)
         
         # extra removal
