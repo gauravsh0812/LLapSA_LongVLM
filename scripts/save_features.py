@@ -67,7 +67,7 @@ def reduce_similar_frames(visual_emb_frame):
     assert visual_emb_frame.shape[0] % window_size == 0, "num frames should be multiple of 5!"
 
     new_visual_emb_frames = []
-    max_visual_len = visual_emb_frame.shape[1] * (visual_emb_frame.shape[0]/2)  # keeping 50% frames
+    max_visual_len = visual_emb_frame.shape[1] * (visual_emb_frame.shape[0] * 0.6)  # keeping 60% frames
 
     for start_idx in range(0, len(visual_emb_frame), 5):
         end_idx = min(start_idx + window_size, len(visual_emb_frame))
