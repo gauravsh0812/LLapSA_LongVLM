@@ -35,7 +35,7 @@ class SiglipVisionTower(BaseVisionTower):
         elif self.unfreeze_mm_vision_tower:
             self.load_model()
         else:
-            self._hidden_size = 1152
+            self._hidden_size = 1024
 
     def load_model(self, device_map=None):
         self.vision_tower = SiglipVisionModel.from_pretrained(self.vision_tower_name)
