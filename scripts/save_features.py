@@ -93,6 +93,7 @@ def reduce_similar_frames(visual_emb_frame):
     
     if reduced_visual_len > max_visual_len:
         factor = (reduced_visual_len - max_visual_len) % len(new_visual_emb_frames)
+        print(factor)
         force_remove = math.ceil(
             (reduced_visual_len - max_visual_len - factor)
             / len(new_visual_emb_frames)
@@ -103,7 +104,7 @@ def reduce_similar_frames(visual_emb_frame):
                 :-force_remove
         ]
         # extra removal
-        for _ in range(factor):
+        for _ in range(int(factor)):
             chunk_i = random.randint(0, len(new_visual_emb_frames) - 1)
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-1]
         
