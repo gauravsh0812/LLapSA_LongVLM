@@ -22,10 +22,10 @@ def parse_args():
     return args
 
 class SiglipVisionTower(BaseVisionTower):
-    def __init__(self, vision_tower_name, delay_load=False):
+    def __init__(self, vision_tower_name="google/siglip-so400m-patch14-384", delay_load=False):
         super(SiglipVisionTower, self).__init__(vision_tower_name, delay_load)
         
-        model_path = "google/siglip-so400m-patch14-384"
+        model_path = vision_tower_name
         base_model_name, res, interp = model_path, 384, 576
         self.vision_tower_name = base_model_name
         self._image_size = res if res is not None else 512
@@ -117,14 +117,11 @@ def reduce_similar_frames(visual_emb_frame):
         # new_visual_emb_frames = visual_emb_frame[::step, :, :]  # Slicing to get [50, :, :]
         # new_visual_emb_frames = new_visual_emb_frames.flatten(0,1)
 
-         # 60% frames
+        # 60% frames
         total_frames = visual_emb_frame.shape[0]
         target_frames = int(total_frames * 0.6)
         indices = torch.linspace(0, total_frames - 1, steps=target_frames).round().long()
         new_visual_emb_frames = visual_emb_frame[indices, :].flatten(0, 1)
-    
-    if new_visual_emb_frames.shape[0] > max_visual_len:
-        print(new_visual_emb_frames.shape)
 
     return new_visual_emb_frames
 
@@ -150,12 +147,17 @@ def process_dino_and_vcgpt_files(x, y):
     dino_files = os.listdir(dino_path)[x:y]
     output_path = args.output_path
 
+    siglip = SiglipVisionTower()
+
     # Load pickled tensors
     for file in tqdm.tqdm(dino_files, total=len(dino_files)):
         # if not os.path.exists(f"{output_path}/{file}"):
         #     try:
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:]
-        reduced_tensor = reduce_similar_frames(dino_tensors) 
+        reduced_tensor = reduce_similar_frames(dino_tensors) # (15360, 1536)
+        siglip_tensor = siglip(reduced_tensor)
+        print(siglip_tensor)
+
         
         # exit()
         # spatial_tokens = get_spatio_temporal_features(reduced_tensor)
