@@ -123,6 +123,11 @@ def reduce_similar_frames(visual_emb_frame):
         indices = torch.linspace(0, total_frames - 1, steps=target_frames).round().long()
         new_visual_emb_frames = visual_emb_frame[indices, :].flatten(0, 1)
 
+    new_visual_emb_frames = new_visual_emb_frames.view(
+                            int(new_visual_emb_frames.shape[0]/visual_emb_frame.shape[0]),
+                            visual_emb_frame.shape[1],
+                            new_visual_emb_frames.shape[-1]
+                            )
     return new_visual_emb_frames
 
 def get_spatio_temporal_features(features, num_temporal_tokens=20):
@@ -157,10 +162,7 @@ def process_dino_and_vcgpt_files(x, y):
         #     try:
         dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:,:]
         print("dino: ", dino_tensors.shape)
-        reduced_tensor = reduce_similar_frames(dino_tensors) # (15360, 1024)
-        reduced_tensor = reduced_tensor.view(int(reduced_tensor.shape[0]/dino_tensors.shape[1]),
-                                             dino_tensors.shape[1],
-                                             reduced_tensor.shape[-1])
+        reduced_tensor = reduce_similar_frames(dino_tensors) # (60, 256, 1024)
         print("reduced: ", reduced_tensor.shape)
 
         siglip_tensor = siglip(reduced_tensor)
