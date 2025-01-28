@@ -124,7 +124,7 @@ def reduce_similar_frames(visual_emb_frame):
         new_visual_emb_frames = visual_emb_frame[indices, :].flatten(0, 1)
 
     new_visual_emb_frames = new_visual_emb_frames.view(
-                            int(new_visual_emb_frames.shape[0]/visual_emb_frame.shape[0]),
+                            int(new_visual_emb_frames.shape[0]/visual_emb_frame.shape[1]),
                             visual_emb_frame.shape[1],
                             new_visual_emb_frames.shape[-1]
                             )
