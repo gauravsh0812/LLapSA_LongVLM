@@ -97,6 +97,8 @@ def reduce_similar_frames(visual_emb_frame):
             (reduced_visual_len - max_visual_len - factor)
             / len(new_visual_emb_frames)
         )
+        print(factor, force_remove)
+        
         # force removal 
         for chunk_i in range(len(new_visual_emb_frames)):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][
@@ -109,7 +111,7 @@ def reduce_similar_frames(visual_emb_frame):
         
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
         print(new_visual_emb_frames.shape)
-        
+
     else:
         # if the video is shorter, keep it intact
         # we would not extract key frames rather just take the 50% alternate frames
