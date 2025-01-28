@@ -108,7 +108,7 @@ def reduce_similar_frames(visual_emb_frame):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-1]
         
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
-        new_visual_emb_frames = new_visual_emb_frames[:max_visual_len,:]
+        new_visual_emb_frames = new_visual_emb_frames[:int(max_visual_len), :]
         
     else:
         # if the video is shorter, keep it intact
