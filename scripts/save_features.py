@@ -101,7 +101,9 @@ def reduce_similar_frames(visual_emb_frame):
         # force removal 
         for chunk_i in range(len(new_visual_emb_frames)):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-force_remove]
-
+        
+        print(torch.cat(new_visual_emb_frames, dim=0))
+        
         # extra removal
         for _ in range(int(factor)):
             chunk_i = random.randint(0, len(new_visual_emb_frames) - 1)
