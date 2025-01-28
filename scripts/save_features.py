@@ -165,7 +165,7 @@ def process_dino_and_vcgpt_files(x, y):
         reduced_tensor = reduce_similar_frames(dino_tensors) # (60, 256, 1024)
         print("reduced: ", reduced_tensor.shape)
 
-        siglip_tensor = siglip(reduced_tensor)
+        siglip_tensor = siglip(reduced_tensor.unsqueeze(0))
         print(siglip_tensor)
 
         
