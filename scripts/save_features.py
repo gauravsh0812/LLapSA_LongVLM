@@ -109,7 +109,7 @@ def reduce_similar_frames(visual_emb_frame):
             new_visual_emb_frames[chunk_i] = new_visual_emb_frames[chunk_i][:-1]
         new_visual_emb_frames = torch.cat(new_visual_emb_frames, dim=0)
 
-        if new_visual_emb_frames.shape[0] > 12800:
+        if new_visual_emb_frames.shape[0] > max_visual_len:
             print(factor, force_remove)
             print(reduced_visual_len, max_visual_len, reduced_visual_len - max_visual_len)
             print(new_visual_emb_frames.shape)
