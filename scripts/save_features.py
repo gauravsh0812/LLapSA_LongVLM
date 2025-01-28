@@ -169,7 +169,7 @@ def process_dino_and_vcgpt_files(x, y):
         # print("reduced: ", reduced_tensor.shape)
         reduced_tensors.append(reduced_tensor)
     
-    siglip_input = torch.stack(reduced_tensors, dim=0)
+    siglip_input = torch.cat(reduced_tensors, dim=0)
     print(siglip_input.shape)
     siglip_tensor = siglip(siglip_input)
     print(siglip_tensor.shape)
