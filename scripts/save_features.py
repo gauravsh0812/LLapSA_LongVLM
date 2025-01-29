@@ -12,6 +12,7 @@ import torch.nn.functional as F
 from transformers import SiglipImageProcessor, SiglipVisionModel, SiglipVisionConfig
 from scripts.base_encoder import BaseVisionTower
 from longvlm.model.merge import merge_tokens
+from scripts.dino_encoder import load_video
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Training")
@@ -154,7 +155,7 @@ def process_dino_and_vcgpt_files(x, y):
 
     print("dino path: ", dino_path)
 
-    siglip = SiglipVisionTower()
+    # siglip = SiglipVisionTower()
 
     # Load pickled tensors
     reduced_tensors = []
@@ -180,11 +181,9 @@ def process_dino_and_vcgpt_files(x, y):
         ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
         print(local_feat.shape)
 
-        # global_features 
-        global_feat = torch.cat(
-            [mem[:, :1] for mem in reduced_tensor], 
-            dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
-        print(global_feat.shape)
+        # spatial features from clip forr frames 
+        arr = [19,39,59,79,99]
+
         
 if __name__ == "__main__":
     args = parse_args()
