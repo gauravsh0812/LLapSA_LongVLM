@@ -18,7 +18,6 @@ def parse_args():
     parser.add_argument("--dino_path", required=True, help="Path to read the dino tensors from.")
     parser.add_argument("--video_path", required=True, help="Path to read the videos from.")
     parser.add_argument("--local_feature_path", required=True, help="path to save local features")
-    parser.add_argument("--global_feature_path", required=True, help="path to save global features")
     args = parser.parse_args()
     return args
 
@@ -115,8 +114,6 @@ def process_dino_and_vcgpt_files(x, y):
     video_path = args.video_path
     dino_files = os.listdir(dino_path)[x:y]
     local_path = args.local_feature_path
-    global_path = args.global_feature_path
-
     os.makedirs(local_path, exist_ok=True)
 
     # Initialize the CLIP model
@@ -145,8 +142,6 @@ def process_dino_and_vcgpt_files(x, y):
         select_hidden_state_layer = -2
         select_hidden_state = image_forward_outs.hidden_states[select_hidden_state_layer]
         batch_features = select_hidden_state[:, 1:] # (5, 256, 1024)
-        print(batch_features.shape)
-        print(reduced_tensor.shape)
 
         batch_features = batch_features.repeat(12, 1, 1)[:60]  # (60,:,:)
 
@@ -176,7 +171,6 @@ def process_dino_and_vcgpt_files(x, y):
         print(local_feat.shape)
 
 
-        
 if __name__ == "__main__":
     args = parse_args()
     x, y = args.xy.split("-")
