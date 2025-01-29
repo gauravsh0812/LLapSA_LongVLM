@@ -141,20 +141,20 @@ def main():
         video_id = video_name.split('.')[0]
         if os.path.exists(f"{vcgpt_features}/{video_id}.pkl"):
             continue
-        try:
-            frames = load_video(video_path)
-            preprocessed_frames = dino.preprocess_frames(frames)
-            features = dino.extract_features(preprocessed_frames, layer_index=-2)
-            video_clip_features[video_id] = features.half()
-            counter += 1       
+        # try:
+        frames = load_video(video_path)
+        preprocessed_frames = dino.preprocess_frames(frames)
+        features = dino.extract_features(preprocessed_frames, layer_index=-2)
+        video_clip_features[video_id] = features.half()
+        counter += 1       
 
-            # getting global features
-            if not os.path.exists(f"{global_feature_path}/{video_id}.pkl"):
-                memory_features[video_id] = torch.cat([mem[:, :1] for mem in features.hidden_states], 
-                                                      dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
-            
-        except Exception as e:
-            print(f"Can't process {video_path} due to {e}")
+        # getting global features
+        if not os.path.exists(f"{global_feature_path}/{video_id}.pkl"):
+            memory_features[video_id] = torch.cat([mem[:, :1] for mem in features.hidden_states], 
+                                                    dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
+        
+        # except Exception as e:
+        #     print(f"Can't process {video_path} due to {e}")
     
         if counter % 50==0:
             for key in video_clip_features.keys():
