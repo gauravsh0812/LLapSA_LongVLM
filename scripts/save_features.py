@@ -21,43 +21,43 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-class SiglipVisionTower(BaseVisionTower):
-    def __init__(self, vision_tower_name="google/siglip-so400m-patch14-384", delay_load=False):
-        super(SiglipVisionTower, self).__init__(vision_tower_name, delay_load)
+# class SiglipVisionTower(BaseVisionTower):
+#     def __init__(self, vision_tower_name="google/siglip-so400m-patch14-384", delay_load=False):
+#         super(SiglipVisionTower, self).__init__(vision_tower_name, delay_load)
         
-        model_path = vision_tower_name
-        base_model_name, res, interp = model_path, 384, 576
-        self.vision_tower_name = base_model_name
-        self._image_size = res if res is not None else 512
-        self._interp_size = interp
-        if not self.delay_load:
-            self.load_model()
-        elif self.unfreeze_mm_vision_tower:
-            self.load_model()
-        else:
-            self._hidden_size = 1024
+#         model_path = vision_tower_name
+#         base_model_name, res, interp = model_path, 384, 576
+#         self.vision_tower_name = base_model_name
+#         self._image_size = res if res is not None else 512
+#         self._interp_size = interp
+#         if not self.delay_load:
+#             self.load_model()
+#         elif self.unfreeze_mm_vision_tower:
+#             self.load_model()
+#         else:
+#             self._hidden_size = 1024
 
-    def load_model(self, device_map=None):
-        self.vision_tower = SiglipVisionModel.from_pretrained(self.vision_tower_name)
-        self.vision_tower.output_tokens = True
+#     def load_model(self, device_map=None):
+#         self.vision_tower = SiglipVisionModel.from_pretrained(self.vision_tower_name)
+#         self.vision_tower.output_tokens = True
 
-        self._hidden_size = self.vision_tower.config.hidden_size
-        self._image_size = self.vision_tower.config.image_size
-        self._patch_size = self.vision_tower.config.patch_size
-        self.image_processor = SiglipImageProcessor.from_pretrained(
-            self.vision_tower_name
-        )
+#         self._hidden_size = self.vision_tower.config.hidden_size
+#         self._image_size = self.vision_tower.config.image_size
+#         self._patch_size = self.vision_tower.config.patch_size
+#         self.image_processor = SiglipImageProcessor.from_pretrained(
+#             self.vision_tower_name
+#         )
 
-        self.vision_tower.requires_grad_(self.unfreeze_mm_vision_tower)
-        self.is_loaded = True
+#         self.vision_tower.requires_grad_(self.unfreeze_mm_vision_tower)
+#         self.is_loaded = True
 
-    def forward(self, images,):
-        with torch.set_grad_enabled(self.unfreeze_mm_vision_tower):
-            image_features = self.vision_tower.forward(
-                images.to(device=self.device, dtype=self.dtype),
-                output_hidden_states=True, interpolate_pos_encoding=True,
-            ).hidden_states[-1]
-            return image_features
+#     def forward(self, images,):
+#         with torch.set_grad_enabled(self.unfreeze_mm_vision_tower):
+#             image_features = self.vision_tower.forward(
+#                 images.to(device=self.device, dtype=self.dtype),
+#                 output_hidden_states=True, interpolate_pos_encoding=True,
+#             ).hidden_states[-1]
+#             return image_features
 
 def reduce_similar_frames(visual_emb_frame):
     
