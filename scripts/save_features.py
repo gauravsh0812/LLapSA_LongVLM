@@ -131,7 +131,6 @@ def process_dino_and_vcgpt_files(x, y):
     vision_tower.eval()
 
     # Load pickled tensors
-    reduced_tensors = []
     for file in tqdm.tqdm(dino_files, total=len(dino_files)):
         # if not os.path.exists(f"{output_path}/{file}"):
         #     try:
@@ -150,6 +149,7 @@ def process_dino_and_vcgpt_files(x, y):
         select_hidden_state = image_forward_outs.hidden_states[select_hidden_state_layer]
         batch_features = select_hidden_state[:, 1:]
         print(batch_features.shape)
+        print(reduced_tensor.shape)
         exit()
 
         window = int(reduced_tensor.shape[0] // len(arr))
