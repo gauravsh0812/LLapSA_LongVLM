@@ -142,7 +142,6 @@ def process_dino_and_vcgpt_files(x, y):
         select_hidden_state_layer = -2
         select_hidden_state = image_forward_outs.hidden_states[select_hidden_state_layer]
         batch_features = select_hidden_state[:, 1:] # (5, 256, 1024)
-
         batch_features = batch_features.repeat(12, 1, 1)[:60]  # (60,:,:)
 
         # Compute attention scores (dot product between A_expanded and B)
@@ -169,7 +168,9 @@ def process_dino_and_vcgpt_files(x, y):
             r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
         ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
         print(local_feat.shape)
-
+        exit()
+        with open(f"{local_path}/{file}", 'wb') as f:
+            pickle.dump(local_feat, f)
 
 if __name__ == "__main__":
     args = parse_args()
