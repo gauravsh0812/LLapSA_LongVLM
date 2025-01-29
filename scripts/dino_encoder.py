@@ -160,14 +160,21 @@ def main():
         if counter % 50==0:
             for key in video_clip_features.keys():
                 features = video_clip_features[key]
+                gfeatures = memory_features[key]
                 with open(f"{vcgpt_features}/{key}.pkl", 'wb') as f:
                     pickle.dump(features, f)
+                with open(f"{global_feature_path}/{key}.pkl", 'wb') as f:
+                    pickle.dump(gfeatures, f)
             video_clip_features = {}
+            memory_features = {}
     
     for key in video_clip_features.keys():
         features = video_clip_features[key]
+        gfeatures = memory_features[key]
         with open(f"{vcgpt_features}/{key}.pkl", 'wb') as f:
             pickle.dump(features, f)
+        with open(f"{global_feature_path}/{key}.pkl", 'wb') as f:
+            pickle.dump(gfeatures, f)
 
 if __name__ == "__main__":
     main()  
