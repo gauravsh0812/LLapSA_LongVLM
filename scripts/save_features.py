@@ -141,7 +141,7 @@ def process_dino_and_vcgpt_files(x, y):
         # spatial features from clip forr frames 
         # one for 12 frames
         arr = [19,39,59,79,99]
-        frames = load_video(open(f"{video_path}/{file.replace('.pkl','.mp4')}"))        
+        frames = load_video(f"{video_path}/{file.replace('.pkl','.mp4')}")
         frames = torch.stack([frames[i] for i in arr], dim=0)
         print(frames.shape)
         exit()
@@ -167,8 +167,6 @@ if __name__ == "__main__":
     x, y = args.xy.split("-")
     process_dino_and_vcgpt_files(int(x), int(y))
 
+    
 
-# Example usage:
-# embeddings = np.random.rand(100, 512)  # Example CLIP embeddings
-# unique_indices = calculate_average_similarity(embeddings)
-# filtered_embeddings = embeddings[unique_indices]
+# git pull; python scripts/save_features.py --video_path /data/shared/gauravs/llapsa/vcgpt_clips/ --dino_path /data/shared/gauravs/llapsa/llapsa_encoded_video_clips/dino_features/dino_features/ --local_feature_path /data/shared/gauravs/llapsa/llapsa_encoded_video_clips/local_features --global_feature_path /data/shared/gauravs/llapsa/llapsa_encoded_video_clips/global_features --xy 0-10
