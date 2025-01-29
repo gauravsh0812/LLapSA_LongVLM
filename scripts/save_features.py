@@ -165,16 +165,26 @@ def process_dino_and_vcgpt_files(x, y):
         # print("dino: ", dino_tensors.shape)
         reduced_tensor = reduce_similar_frames(dino_tensors) # (60, 256, 1024)
         # print("reduced: ", reduced_tensor.shape)
-        reduced_tensor = reduced_tensor.unsqueeze(1).repeat(1, 3, 1, 1)
+        # reduced_tensor = reduced_tensor.unsqueeze(1).repeat(1, 3, 1, 1)
         # print("reduced: ", reduced_tensor.shape)
-        reduced_tensors.append(reduced_tensor)
     
-    from torch.amp import autocast
-    with autocast():
-        siglip_input = torch.cat(reduced_tensors, dim=0)
-        print(siglip_input.shape)
-        siglip_tensor = siglip(siglip_input)
-        print(siglip_tensor.shape)
+        # siglip_input = torch.cat(reduced_tensors, dim=0)
+        # print(siglip_input.shape)
+        # siglip_tensor = siglip(siglip_input)
+        # print(siglip_tensor.shape)
+
+        # local features
+        local_feat = merge_tokens(
+            reduced_tensor, 
+            r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
+        ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
+        print(local_feat.shape)
+
+        # global_features 
+        global_feat = torch.cat(
+            [mem[:, :1] for mem in reduced_tensor], 
+            dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
+        print(global_feat.shape)
         
 if __name__ == "__main__":
     args = parse_args()
