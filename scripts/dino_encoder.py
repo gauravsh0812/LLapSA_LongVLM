@@ -46,6 +46,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Training")
     parser.add_argument("--video_dir_path", required=True, help="Path to read the videos from.")
     parser.add_argument("--clip_feat_path", required=True, help="The output dir to save the features in.")
+    parser.add_argument("--global_feature_path", required=True, help="path to save global features")
     parser.add_argument("--xy", required=True)
     args = parser.parse_args()
     return args
@@ -131,6 +132,7 @@ def main():
     dino = DinoFeatureExtractor()
 
     video_clip_features = {}
+    memory_features = {}
     counter = 0
 
     for video_name in tqdm(all_videos):
@@ -144,6 +146,11 @@ def main():
             features = dino.extract_features(preprocessed_frames, layer_index=-2)
             video_clip_features[video_id] = features.half()
             counter += 1       
+
+            # getting global features
+            if not os.path.exists(f"{global_feature_path}/{video_id}.pkl"):
+                memory_features[video_id] = torch.cat([mem[:, :1] for mem in features.hidden_states], 
+                                                      dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
             
         except Exception as e:
             print(f"Can't process {video_path} due to {e}")

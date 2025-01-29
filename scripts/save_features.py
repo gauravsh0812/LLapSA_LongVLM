@@ -22,8 +22,6 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-
-
 def reduce_similar_frames(visual_emb_frame):
     
     "https://github.com/Vision-CAIR/LongVU/blob/1ca42869fd456ecfef8acdc2aaa01e43864431e0/longvu/cambrian_arch.py#L1474"
@@ -120,7 +118,6 @@ def process_dino_and_vcgpt_files(x, y):
     global_path = args.global_feature_path
 
     os.makedirs(local_path, exist_ok=True)
-    os.makedirs(global_path, exist_ok=True)
 
     # Initialize the CLIP model
     image_processor = CLIPImageProcessor.from_pretrained('openai/clip-vit-large-patch14', 
@@ -147,20 +144,38 @@ def process_dino_and_vcgpt_files(x, y):
         image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
         select_hidden_state_layer = -2
         select_hidden_state = image_forward_outs.hidden_states[select_hidden_state_layer]
-        batch_features = select_hidden_state[:, 1:]
+        batch_features = select_hidden_state[:, 1:] # (5, 256, 1024)
         print(batch_features.shape)
         print(reduced_tensor.shape)
-        exit()
 
-        window = int(reduced_tensor.shape[0] // len(arr))
+        batch_features = batch_features.repeat(12, 1, 1)[:60]  # (60,:,:)
 
-        
+        # Compute attention scores (dot product between A_expanded and B)
+        attn_scores = torch.sum(batch_features * reduced_tensor, dim=-1)  # Shape: [60, 256]
+
+        # Normalize with softmax (across sequence dimension)
+        attn_weights = F.softmax(attn_scores, dim=0)  # Shape: [60, 256]
+
+        # Expand attn_weights to match feature dimensions
+        attn_weights = attn_weights.unsqueeze(-1)  # Shape: [60, 256, 1]
+
+        # Apply attention to B
+        fused_tensor = attn_weights * reduced_tensor  # Shape: [60, 256, 1024]
+
+        # Option 1: Weighted Sum Fusion (Adds CLIP's info into B)
+        fused_tensor = fused_tensor + batch_features  # Shape: [60, 256, 1024]
+
+        # Option 2: Concatenation Fusion (Keeps A separate)
+        # output = torch.cat([B_fused, A_expanded], dim=-1)  # Shape: [60, 256, 2048]
+
         # local features
         local_feat = merge_tokens(
-            reduced_tensor, 
+            fused_tensor, 
             r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
         ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
         print(local_feat.shape)
+
+
         
 if __name__ == "__main__":
     args = parse_args()
