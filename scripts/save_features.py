@@ -167,8 +167,6 @@ def process_dino_and_vcgpt_files(x, y):
             fused_tensor, 
             r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
         ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
-        print(local_feat.shape)
-        exit()
         with open(f"{local_path}/{file}", 'wb') as f:
             pickle.dump(local_feat, f)
 
