@@ -116,10 +116,11 @@ def process_dino_and_vcgpt_files(x, y):
     dino_path = args.dino_path
     video_path = args.video_path
     dino_files = os.listdir(dino_path)[x:y]
-    output_path = args.output_path
+    local_path = args.local_feature_path
+    global_path = args.global_feature_path
 
-    os.makedirs(f"{output_path}/local_features", exist_ok=True)
-    os.makedirs(f"{output_path}/global_features", exist_ok=True)
+    os.makedirs(local_path, exist_ok=True)
+    os.makedirs(global_path, exist_ok=True)
 
     # Initialize the CLIP model
     image_processor = CLIPImageProcessor.from_pretrained('openai/clip-vit-large-patch14', 
