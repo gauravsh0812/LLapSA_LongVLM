@@ -45,7 +45,7 @@ def get_seq_frames(total_num_frames, desired_num_frames):
 def parse_args():
     parser = argparse.ArgumentParser(description="Training")
     parser.add_argument("--video_dir_path", required=True, help="Path to read the videos from.")
-    parser.add_argument("--clip_feat_path", required=True, help="The output dir to save the features in.")
+    parser.add_argument("--dino_feat_path", required=True, help="The output dir to save the features in.")
     parser.add_argument("--global_feature_path", required=True, help="path to save global features")
     parser.add_argument("--xy", required=True)
     args = parser.parse_args()
