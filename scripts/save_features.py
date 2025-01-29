@@ -142,6 +142,8 @@ def process_dino_and_vcgpt_files(x, y):
         # one for 12 frames
         arr = [19,39,59,79,99]
         frames = load_video(f"{video_path}/{file.replace('.pkl','.mp4')}")
+        print(len(frames))
+        print(frames[0].shape)
         frames = torch.stack([frames[i] for i in arr], dim=0)
         print(frames.shape)
         exit()
