@@ -121,9 +121,10 @@ def main():
 
     args = parse_args()
     video_dir_path = args.video_dir_path
-    clip_feat_path = args.clip_feat_path
-    vcgpt_features = os.path.join(clip_feat_path, "dino_features")
+    vcgpt_features = args.clip_feat_path
+    global_feature_path = args.global_feature_path
     os.makedirs(vcgpt_features, exist_ok=True)
+    os.makedirs(global_feature_path, exist_ok=True)
 
     # Initialize the DinoV2 model    
     x,y = args.xy.split("-")
@@ -169,6 +170,3 @@ def main():
 
 if __name__ == "__main__":
     main()  
-
-
-# git pull; CUDA_VISIBLE_DEVICES=0 python scripts/save_vcgpt_features.py --video_dir_path /data/shared/gauravs/llapsa/vcgpt_clips --clip_feat_path /data/shared/gauravs/llapsa/longvu_videos
