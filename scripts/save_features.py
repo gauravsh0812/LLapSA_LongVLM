@@ -143,14 +143,14 @@ def process_dino_and_vcgpt_files(x, y):
         arr = [19,39,59,79,99]
         frames = load_video(f"{video_path}/{file.replace('.pkl','.mp4')}")
         frames = [frames[i] for i in arr]
-        print(len(frames))
-        exit()
         video_tensor = image_processor.preprocess(frames, return_tensors='pt')['pixel_values']
         video_tensor = video_tensor.half()
-        image_forward_outs = vision_tower(video_batch, output_hidden_states=True)
+        image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
         select_hidden_state_layer = -2
         select_hidden_state = image_forward_outs.hidden_states[select_hidden_state_layer]
         batch_features = select_hidden_state[:, 1:]
+        print(batch_features.shape)
+        exit()
 
         window = int(reduced_tensor.shape[0] // len(arr))
 
