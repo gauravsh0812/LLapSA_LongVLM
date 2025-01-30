@@ -94,7 +94,7 @@ def main():
     video_features = {}
     memory_features = {}
     counter = 0
-    for video_name in tqdm(all_videos[3000:4000]):
+    for video_name in tqdm(all_videos[4000:5500]):
         video_path = f"{video_dir_path}/{video_name}"
         video_id = video_name.split('.')[0]
 
