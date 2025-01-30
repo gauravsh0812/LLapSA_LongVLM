@@ -75,8 +75,8 @@ def main():
     #clip_feat_path_all = args.clip_feat_path_all
     infer_batch = args.infer_batch
     #os.makedirs(clip_feat_path_pool, exist_ok=True)
-    os.makedirs(clip_feat_path_local, exist_ok=True)
-    os.makedirs(clip_feat_path_memory, exist_ok=True)
+    # os.makedirs(clip_feat_path_local, exist_ok=True)
+    # os.makedirs(clip_feat_path_memory, exist_ok=True)
     pretrained_path = args.pretrained_path
 
     # Initialize the CLIP model
