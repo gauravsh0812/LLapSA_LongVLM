@@ -8,7 +8,7 @@ from PIL import Image
 from tqdm import tqdm
 from decord import VideoReader, cpu
 from transformers import CLIPVisionModel, CLIPImageProcessor
-# from longvlm.merge import merge_tokens 
+from longvlm.model.merge import merge_tokens 
 
 
 
@@ -72,11 +72,10 @@ def main():
     video_dir_path = args.video_dir_path
     clip_feat_path_local = args.clip_feat_path_local
     clip_feat_path_memory = args.clip_feat_path_memory
-    #clip_feat_path_all = args.clip_feat_path_all
-    # infer_batch = args.infer_batch
-    #os.makedirs(clip_feat_path_pool, exist_ok=True)
-    # os.makedirs(clip_feat_path_local, exist_ok=True)
-    # os.makedirs(clip_feat_path_memory, exist_ok=True)
+
+    os.makedirs(clip_feat_path_local, exist_ok=True)
+    os.makedirs(clip_feat_path_memory, exist_ok=True)
+    
     pretrained_path = args.pretrained_path
 
     # Initialize the CLIP model
@@ -99,9 +98,9 @@ def main():
         video_path = f"{video_dir_path}/{video_name}"
         video_id = video_name.split('.')[0]
 
-        # if os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl") and os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):  # Check if the file is already processed
-        #     print(f"{video_id}.pkl exist")
-        #     continue
+        if os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl") and os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):  # Check if the file is already processed
+            print(f"{video_id}.pkl exist")
+            continue
         try:
             video = load_video(video_path)
             video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
@@ -109,14 +108,13 @@ def main():
 
             with torch.no_grad():
                 image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
-            print("length 0: -->", image_forward_outs.hidden_states[0][:, 1:].shape)
-            print("length 5: -->", image_forward_outs.hidden_states[4][:, 1:].shape)
-            print("length 15: -->", image_forward_outs.hidden_states[14][:, 1:].shape)
-            print("length 25: -->", image_forward_outs.hidden_states[-2][:, 1:].shape)
-            exit()
+
             if not os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):
-                video_features[video_id] = merge_tokens(image_forward_outs.hidden_states[-2][:, 1:], r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
-            
+                feats = []
+                for i in [0,5,15,-2]:
+                    feats.append(merge_tokens(image_forward_outs.hidden_states[i][:, 1:], r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16"))  # [1280, 640, 320, 160, 80, 40, 10]
+                video_features[video_id] = torch.stack(feats, dim=0)    
+
             if not os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl"):
                 memory_features[video_id] = torch.cat([mem[:, :1] for mem in image_forward_outs.hidden_states], dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
             counter += 1
