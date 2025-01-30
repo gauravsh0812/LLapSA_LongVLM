@@ -113,7 +113,7 @@ def main():
                 feats = []
                 for i in [0,5,15,-2]:
                     feats.append(merge_tokens(image_forward_outs.hidden_states[i][:, 1:], r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16"))  # [1280, 640, 320, 160, 80, 40, 10]
-                video_features[video_id] = torch.stack(feats, dim=0)    
+                video_features[video_id] = torch.cat(feats, dim=0)    
 
             if not os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl"):
                 memory_features[video_id] = torch.cat([mem[:, :1] for mem in image_forward_outs.hidden_states], dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
