@@ -180,4 +180,4 @@ if __name__ == "__main__":
 
     
 
-# git pull; python scripts/save_features.py --video_path /data/shared/gauravs/llapsa/vcgpt_clips/ --dino_path /data/shared/gauravs/llapsa/llapsa_encoded_video_clips/dino_features/dino_features/ --local_feature_path /data/shared/gauravs/llapsa/llapsa_encoded_video_clips/local_features --global_feature_path /data/shared/gauravs/llapsa/llapsa_encoded_video_clips/global_features --xy 0-10
+# git pull; python scripts/save_features.py --video_path /data/shared/gauravs/llapsa/vcgpt_clips/ --dino_path /data/shared/gauravs/llapsa/llapsa_encoded_video_clips/dino_features/dino_features/ --local_feature_path /data/shared/gauravs/llapsa/llapsa_encoded_video_clips/local_features --xy 0-10
