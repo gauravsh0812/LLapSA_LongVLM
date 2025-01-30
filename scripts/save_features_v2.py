@@ -91,7 +91,7 @@ def main():
     with open(args.list_file, 'r') as f:
         all_videos = f.read().splitlines() 
     
-    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][1000:2000]
+    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][2000:3000]
 
     video_features = {}
     memory_features = {}
