@@ -98,29 +98,29 @@ def main():
         video_path = f"{video_dir_path}/{video_name}"
         video_id = video_name.split('.')[0]
 
-        if os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl") and os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):  # Check if the file is already processed
-            print(f"{video_id}.pkl exist")
-            continue
-        try:
-            video = load_video(video_path)
-            video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
-            video_tensor = video_tensor.half().cuda()
+        # if os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl") and os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):  # Check if the file is already processed
+        #     print(f"{video_id}.pkl exist")
+        #     continue
+        # try:
+        video = load_video(video_path)
+        video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
+        video_tensor = video_tensor.half().cuda()
 
-            with torch.no_grad():
-                image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
+        with torch.no_grad():
+            image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
 
-            if not os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):
-                feats = []
-                for i in [0,5,15,-2]:
-                    feats.append(merge_tokens(image_forward_outs.hidden_states[i][:, 1:], r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16"))  # [1280, 640, 320, 160, 80, 40, 10]
-                video_features[video_id] = torch.cat(feats, dim=0)    
+        if not os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):
+            feats = []
+            for i in [0,5,15,-2]:
+                feats.append(merge_tokens(image_forward_outs.hidden_states[i][:, 1:], r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16"))  # [1280, 640, 320, 160, 80, 40, 10]
+            video_features[video_id] = torch.cat(feats, dim=0)    
 
-            if not os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl"):
-                memory_features[video_id] = torch.cat([mem[:, :1] for mem in image_forward_outs.hidden_states], dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
-            counter += 1
+        if not os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl"):
+            memory_features[video_id] = torch.cat([mem[:, :1] for mem in image_forward_outs.hidden_states], dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
+        counter += 1
 
-        except Exception as e:
-            print(f"Can't process {video_path}: {e}")
+        # except Exception as e:
+        #     print(f"Can't process {video_path}: {e}")
 
         if counter % 512 == 0:  # Save after every 512 videos, update this number as per your requirements
             for key in video_features.keys():
