@@ -90,11 +90,13 @@ def main():
 
     with open(args.list_file, 'r') as f:
         all_videos = f.read().splitlines() 
+    
+    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][0:1000]
 
     video_features = {}
     memory_features = {}
     counter = 0
-    for video_name in tqdm(all_videos[4000:55000]):
+    for video_name in tqdm(all_videos):
         video_path = f"{video_dir_path}/{video_name}"
         video_id = video_name.split('.')[0]
 
