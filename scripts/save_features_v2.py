@@ -109,10 +109,10 @@ def main():
 
             with torch.no_grad():
                 image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
-            print("length 0: -->", image_forward_outs.hidden_states[0].shape)
-            print("length 5: -->", image_forward_outs.hidden_states[4].shape)
-            print("length 15: -->", image_forward_outs.hidden_states[14].shape)
-            print("length 25: -->", image_forward_outs.hidden_states[-2].shape)
+            print("length 0: -->", image_forward_outs.hidden_states[0][:, 1:].shape)
+            print("length 5: -->", image_forward_outs.hidden_states[4][:, 1:].shape)
+            print("length 15: -->", image_forward_outs.hidden_states[14][:, 1:].shape)
+            print("length 25: -->", image_forward_outs.hidden_states[-2][:, 1:].shape)
             exit()
             if not os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):
                 video_features[video_id] = merge_tokens(image_forward_outs.hidden_states[-2][:, 1:], r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
