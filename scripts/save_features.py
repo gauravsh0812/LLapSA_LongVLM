@@ -129,20 +129,20 @@ def process_dino_and_vcgpt_files(x, y):
         if not os.path.exists(f"{local_path}/{file}"):
             try:
                 dino_tensors = pickle.load(open(f"{dino_path}/{file}", 'rb'))[:,1:,:]
-                reduced_tensor = reduce_similar_frames(dino_tensors) # (60, 256, 1024)
+                # reduced_tensor = reduce_similar_frames(dino_tensors) # (60, 256, 1024)
 
                 # spatial features from clip forr frames 
                 # one for 12 frames
-                # arr = [19,39,59,79,99]
-                # frames = load_video(f"{video_path}/{file.replace('.pkl','.mp4')}")
-                # frames = [frames[i] for i in arr]
-                # video_tensor = image_processor.preprocess(frames, return_tensors='pt')['pixel_values']
-                # video_tensor = video_tensor.half().cuda()
-                # image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
-                # select_hidden_state_layer = -2
-                # select_hidden_state = image_forward_outs.hidden_states[select_hidden_state_layer]
-                # batch_features = select_hidden_state[:, 1:] # (5, 256, 1024)
-                # batch_features = batch_features.repeat(12, 1, 1)[:60]  # (60,:,:)
+                arr = [19,39,59,79,99]
+                frames = load_video(f"{video_path}/{file.replace('.pkl','.mp4')}")
+                frames = [frames[i] for i in arr]
+                video_tensor = image_processor.preprocess(frames, return_tensors='pt')['pixel_values']
+                video_tensor = video_tensor.half().cuda()
+                image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
+                select_hidden_state_layer = -2
+                select_hidden_state = image_forward_outs.hidden_states[select_hidden_state_layer]
+                batch_features = select_hidden_state[:, 1:] # (5, 256, 1024)
+                batch_features = batch_features.repeat(12, 1, 1)[:100]  # (60,:,:)
 
                 # # Compute attention scores (dot product between A_expanded and B)
                 # attn_scores = torch.sum(batch_features * reduced_tensor, dim=-1)  # Shape: [60, 256]
@@ -160,13 +160,21 @@ def process_dino_and_vcgpt_files(x, y):
                 # fused_tensor = fused_tensor + batch_features  # Shape: [60, 256, 1024]
 
                 # Option 2: Concatenation Fusion (Keeps A separate)
-                # output = torch.cat([B_fused, A_expanded], dim=-1)  # Shape: [60, 256, 2048]
+                # output = torch.cat([reduced_tensor, batch_features], dim=-1)  # Shape: [60, 256, 2048]
 
                 # local features
-                local_feat = merge_tokens(
-                    reduced_tensor, 
+                dino_local_feat = merge_tokens(
+                    dino_tensors, 
                     r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
                 ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
+                
+                batch_local_feat = merge_tokens(
+                    dino_tensors, 
+                    r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]
+                ).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
+                
+                print(dino_local_feat.shape, batch_local_feat.shape)
+                exit()
                 with open(f"{local_path}/{file}", 'wb') as f:
                     pickle.dump(local_feat, f)
         
