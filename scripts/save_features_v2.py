@@ -73,7 +73,7 @@ def main():
     clip_feat_path_local = args.clip_feat_path_local
     clip_feat_path_memory = args.clip_feat_path_memory
     #clip_feat_path_all = args.clip_feat_path_all
-    infer_batch = args.infer_batch
+    # infer_batch = args.infer_batch
     #os.makedirs(clip_feat_path_pool, exist_ok=True)
     # os.makedirs(clip_feat_path_local, exist_ok=True)
     # os.makedirs(clip_feat_path_memory, exist_ok=True)
