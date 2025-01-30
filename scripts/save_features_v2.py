@@ -125,7 +125,7 @@ def main():
         except Exception as e:
             print(f"Can't process {video_path}: {e}")
 
-        if counter % 512 == 0:  # Save after every 512 videos, update this number as per your requirements
+        if counter % 50 == 0:  # Save after every 50 videos, update this number as per your requirements
             for key in video_features.keys():
                 clip_video_path = f"{clip_feat_path_local}/{key}.pkl"
                 if not os.path.exists(clip_video_path):
