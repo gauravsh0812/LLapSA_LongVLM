@@ -8,7 +8,7 @@ from PIL import Image
 from tqdm import tqdm
 from decord import VideoReader, cpu
 from transformers import CLIPVisionModel, CLIPImageProcessor
-from longvlm.merge import merge_tokens 
+# from longvlm.merge import merge_tokens 
 
 
 
