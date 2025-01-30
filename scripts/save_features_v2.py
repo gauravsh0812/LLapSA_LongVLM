@@ -56,7 +56,7 @@ def parse_args():
     parser.add_argument("--video_dir_path", required=True, help="Path to read the videos from.")
     parser.add_argument("--clip_feat_path_local", required=True, help="Output dir to save the local features.")
     parser.add_argument("--clip_feat_path_memory", required=True, help="The output dir to save the memory features.")
-    parser.add_argument("--pretrained_path", default="./pretrained/clip-vit-large-patch14", help="Path to load the model config from." )
+    parser.add_argument("--pretrained_path", default="openai/clip-vit-large-patch14", help="Path to load the model config from." )
     parser.add_argument("--list_file", default="./datasets/anet/v1-2_val_subset_split1.txt", help="Path to the video list." )
     args = parser.parse_args()
 
@@ -99,9 +99,9 @@ def main():
         video_path = f"{video_dir_path}/{video_name}"
         video_id = video_name.split('.')[0]
 
-        if os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl") and os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):  # Check if the file is already processed
-            print(f"{video_id}.pkl exist")
-            continue
+        # if os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl") and os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):  # Check if the file is already processed
+        #     print(f"{video_id}.pkl exist")
+        #     continue
         try:
             video = load_video(video_path)
             video_tensor = image_processor.preprocess(video, return_tensors='pt')['pixel_values']
