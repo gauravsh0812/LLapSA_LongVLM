@@ -57,7 +57,8 @@ def parse_args():
     parser.add_argument("--clip_feat_path_local", required=True, help="Output dir to save the local features.")
     parser.add_argument("--clip_feat_path_memory", required=True, help="The output dir to save the memory features.")
     parser.add_argument("--pretrained_path", default="openai/clip-vit-large-patch14", help="Path to load the model config from." )
-    parser.add_argument("--list_file", default="./datasets/anet/v1-2_val_subset_split1.txt", help="Path to the video list." )
+    parser.add_argument("--list_file", required=True, help="Path to the video list." )
+    parser.add_argument("--xy", required=True,)
     args = parser.parse_args()
 
     return args
@@ -91,7 +92,8 @@ def main():
     with open(args.list_file, 'r') as f:
         all_videos = f.read().splitlines() 
     
-    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][4000:5500]
+    x, y = args.xy.split("-")
+    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][int(x):int(y)]
 
     video_features = {}
     memory_features = {}
