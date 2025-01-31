@@ -94,16 +94,16 @@ def main():
     with open(pred_path, 'r', encoding='utf-8') as file:
         pred_contents = json.load(file)
 
-    # os.makedirs(f"{args.output_dir}", exist_ok=True)
-    # os.makedirs(f"{args.output_dir}/correctness", exist_ok=True)
-    # os.makedirs(f"{args.output_dir}/correctness/scores", exist_ok=True)
+    os.makedirs(f"{args.output_dir}", exist_ok=True)
+    os.makedirs(f"{args.output_dir}/correctness", exist_ok=True)
+    os.makedirs(f"{args.output_dir}/correctness/scores_vlm", exist_ok=True)
 
     len_scores = 0
     total_score = 0
 
     didnot_work = 0
 
-    # all_scr_files = os.listdir(f"{args.output_dir}/correctness/scores")
+    all_scr_files = os.listdir(f"{args.output_dir}/correctness/scores_vlm")
 
     for ind, pc  in enumerate(tqdm.tqdm(pred_contents, total=len(pred_contents))):
         try:
@@ -111,13 +111,14 @@ def main():
             ans = pc["answer"]
             pred = pc["pred"]
             vid = pc["video_id"]
-            # if f"{vid}.txt" not in all_scr_files:
-            response = annotate(qtn, pred, ans)
-            scr = response['score']
-            len_scores+=1
-            total_score += scr
-            # with open(f"{args.output_dir}/correctness/scores/{vid}.txt", "w") as f:
-            #     f.write(f"{vid} -- {scr}")
+            if f"{vid}.txt" not in all_scr_files:
+                response = annotate(qtn, pred, ans)
+                scr = response['score']
+                len_scores+=1
+                total_score += scr
+
+                with open(f"{args.output_dir}/correctness/scores_vlm/{vid}.txt", "w") as f:
+                    f.write(f"{vid} -- {scr}")
         
         except:
             didnot_work+=1
