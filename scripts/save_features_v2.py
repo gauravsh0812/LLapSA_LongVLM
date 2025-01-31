@@ -121,7 +121,7 @@ def main():
                                                 image_forward_outs.hidden_states[i-5][:, 1:]), dim=-1)
                 else:
                     cat_features = torch.cat((image_forward_outs.hidden_states[-2][:, 1:],
-                                                image_forward_outs.hidden_states[25][:, 1:]), dim=-1)
+                                                image_forward_outs.hidden_states[24][:, 1:]), dim=-1)
                     
                 feats.append(merge_tokens(cat_features, r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16"))  # [1280, 640, 320, 160, 80, 40, 10]
             
