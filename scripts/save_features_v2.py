@@ -113,8 +113,16 @@ def main():
 
             if not os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):
                 feats = []
-                for i in [0,5,15,-2]:
-                    feats.append(merge_tokens(image_forward_outs.hidden_states[i][:, 1:], r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16"))  # [1280, 640, 320, 160, 80, 40, 10]
+                for i in [5,10,15,20,25,-2]:
+                    if i != -2:
+                        cat_features = torch.cat((image_forward_outs.hidden_states[i][:, 1:],
+                                                    image_forward_outs.hidden_states[i-5][:, 1:]), dim=-1)
+                    else:
+                        cat_features = torch.cat((image_forward_outs.hidden_states[-2][:, 1:],
+                                                    image_forward_outs.hidden_states[25][:, 1:]), dim=-1)
+                        
+                    feats.append(merge_tokens(cat_features, r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16"))  # [1280, 640, 320, 160, 80, 40, 10]
+                
                 feats = [torch.from_numpy(f) for f in feats]
                 video_features[video_id] = torch.cat(feats, dim=0)    
 
