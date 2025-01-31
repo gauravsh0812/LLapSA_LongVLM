@@ -96,14 +96,14 @@ def main():
 
     os.makedirs(f"{args.output_dir}", exist_ok=True)
     os.makedirs(f"{args.output_dir}/correctness", exist_ok=True)
-    os.makedirs(f"{args.output_dir}/correctness/scores_vlm", exist_ok=True)
+    os.makedirs(f"{args.output_dir}/correctness/scores", exist_ok=True)
 
     len_scores = 0
     total_score = 0
 
     didnot_work = 0
 
-    all_scr_files = os.listdir(f"{args.output_dir}/correctness/scores_vlm")
+    all_scr_files = os.listdir(f"{args.output_dir}/correctness/scores")
 
     for ind, pc  in enumerate(tqdm.tqdm(pred_contents, total=len(pred_contents))):
         try:
@@ -117,7 +117,7 @@ def main():
                 len_scores+=1
                 total_score += scr
 
-                with open(f"{args.output_dir}/correctness/scores_vlm/{vid}.txt", "w") as f:
+                with open(f"{args.output_dir}/correctness/scores/{vid}.txt", "w") as f:
                     f.write(f"{vid} -- {scr}")
         
         except:
