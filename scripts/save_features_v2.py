@@ -115,7 +115,7 @@ def main():
 
         if not os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):
             feats = []
-            for i in [5,10,15,20,25,-2]:
+            for i in [4,9,14,19,24,-2]:
                 if i != -2:
                     cat_features = torch.cat((image_forward_outs.hidden_states[i][:, 1:],
                                                 image_forward_outs.hidden_states[i-5][:, 1:]), dim=-1)
