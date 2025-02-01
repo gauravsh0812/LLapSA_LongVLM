@@ -25,24 +25,23 @@ def apply_delta(base_model_path, target_model_path, delta_path):
 
     for name, param in tqdm(delta_sd.items(), desc="Applying delta"):
         if name not in base_sd:
-            # Adjust for changed projection layers
-            if name in ['model.mm1.weight', 'model.mm1.bias', 'model.mm2.weight', 'model.mm2.bias']:
-                if 'model.mm_projector.weight' in base_sd and 'model.mm_projector.bias' in base_sd:
-                    print(f"Mapping mm_projector to new layers: {name}")
+            # Replace mm_projector with mm1 and mm2
+            if name == 'model.mm1.weight':
+                print("Replacing mm_projector.weight → mm1.weight")
+                param.data.copy_(base_sd['model.mm_projector.weight'])
 
-                    # Split mm_projector weights and biases across mm1 and mm2
-                    mm_proj_weight = base_sd['model.mm_projector.weight']
-                    mm_proj_bias = base_sd['model.mm_projector.bias']
+            elif name == 'model.mm1.bias':
+                print("Replacing mm_projector.bias → mm1.bias")
+                param.data.copy_(base_sd['model.mm_projector.bias'])
 
-                    # Assuming mm1 takes part of the projection, and mm2 takes another
-                    param.data.copy_(torch.chunk(mm_proj_weight, 2, dim=0)[0] if 'mm1' in name else torch.chunk(mm_proj_weight, 2, dim=0)[1])
-                    if 'bias' in name:
-                        param.data.copy_(torch.chunk(mm_proj_bias, 2, dim=0)[0] if 'mm1' in name else torch.chunk(mm_proj_bias, 2, dim=0)[1])
+            elif name == 'model.mm2.weight' or name == 'model.mm2.bias':
+                print(f"{name} is a new layer and will be randomly initialized.")
+
             else:
                 assert name in ['model.mm_projector.weight', 'model.mm_projector.bias'], f'{name} not in base model'
             continue
         
-        # Apply the delta normally
+        # Apply delta normally
         if param.data.shape == base_sd[name].shape:
             param.data += base_sd[name]
         else:
