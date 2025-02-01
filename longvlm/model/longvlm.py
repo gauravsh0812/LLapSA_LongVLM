@@ -80,7 +80,7 @@ class LongVLMLlamaModel(LlamaModel):
             inputs_embeds = self.embed_tokens(input_ids)
 
         if (input_ids.shape[1] != 1 or self.training) and local_features is not None:
-            # local_features = self.mm2(local_features)
+            local_features = self.mm2(local_features)
             video_features = self.mm_projector(torch.cat([memory_features, local_features], dim=1))
 
             new_input_embeds = []
@@ -190,7 +190,6 @@ class LongVLMForCausalLM(LlamaForCausalLM):
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         # decoder outputs consists of (dec_features, layer_state, dec_hidden, dec_attn)
-        local_features = self.mm2(local_features)
         outputs = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,
