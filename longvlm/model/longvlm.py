@@ -38,7 +38,7 @@ class LongVLMLlamaModel(LlamaModel):
 
         if hasattr(config, "use_mm_proj"):
             self.mm_projector = nn.Linear(config.mm_hidden_size, config.hidden_size)
-            self.mm2 = nn.Linear(2048,1024)
+            # self.mm2 = nn.Linear(2048,1024)
             
     def initialize_vision_modules(self, pretrain_mm_mlp_adapter=None, tune_mm_mlp_adapter=False):
         vision_config = self.vision_config
@@ -49,7 +49,7 @@ class LongVLMLlamaModel(LlamaModel):
 
         if not hasattr(self, 'mm_projector'):
             self.mm_projector = nn.Linear(vision_config.hidden_size, self.config.hidden_size)
-            self.mm2 = nn.Linear(2048,1024)
+            # self.mm2 = nn.Linear(2048,1024)
         
         if pretrain_mm_mlp_adapter is not None:
             mm_projector_weights = torch.load(pretrain_mm_mlp_adapter, map_location='cpu')
@@ -79,9 +79,9 @@ class LongVLMLlamaModel(LlamaModel):
             inputs_embeds = self.embed_tokens(input_ids)
 
         if (input_ids.shape[1] != 1 or self.training) and local_features is not None:
-            local_features = self.mm2(local_features)
+            # local_features = self.mm2(local_features)
             video_features = self.mm_projector(torch.cat([memory_features, local_features], dim=1))
-            
+
             new_input_embeds = []
             cur_video_idx = 0
             for cur_input_ids, cur_input_embeds in zip(input_ids, inputs_embeds):
@@ -160,7 +160,7 @@ class LongVLMForCausalLM(LlamaForCausalLM):
     def __init__(self, config):
         super(LlamaForCausalLM, self).__init__(config)
         self.model = LongVLMLlamaModel(config)
-
+        self.mm2 = nn.Linear(2048,1024, bias=False)
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
         # Initialize weights and apply final processing
@@ -190,6 +190,7 @@ class LongVLMForCausalLM(LlamaForCausalLM):
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         # decoder outputs consists of (dec_features, layer_state, dec_hidden, dec_attn)
+        local_features = self.mm2(local_features)
         outputs = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,

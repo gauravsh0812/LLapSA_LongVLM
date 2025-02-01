@@ -30,7 +30,7 @@ class LongVLMTrainer(Trainer):
                 _state_dict = model_to_save.state_dict()
 
             weight_to_save = {}
-            keys_to_match = ['mm_projector', 'embed_tokens', 'embed_in', "mm2"]
+            keys_to_match = ['mm_projector', 'embed_tokens', 'embed_in']
             for k, v in _state_dict.items():
                 if any(key_match in k for key_match in keys_to_match):
                     weight_to_save[k] = v

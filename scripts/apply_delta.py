@@ -23,13 +23,12 @@ def apply_delta(base_model_path, target_model_path, delta_path):
     # added by gauravs
     for name, param in tqdm(delta.state_dict().items(), desc="Applying delta"):
         if name not in base.state_dict():
-            assert name in ['model.mm_projector.weight', 'model.mm_projector.bias',
-                            'model.mm2.weight', 'model.mm2.bias'], f'{name} not in base model'
+            assert name in ['model.mm_projector.weight', 'model.mm_projector.bias'], f'{name} not in base model'
             continue
         if param.data.shape == base.state_dict()[name].shape:
             param.data += base.state_dict()[name]
         else:
-            assert name in ['model.embed_tokens.weight', 'lm_head.weight'], \
+            assert name in ['model.embed_tokens.weight', 'lm_head.weight', 'mm2.weight'], \
                 f'{name} dimension mismatch: {param.data.shape} vs {base.state_dict()[name].shape}'
             bparam = base.state_dict()[name]
             param.data[:bparam.shape[0], :bparam.shape[1]] += bparam
