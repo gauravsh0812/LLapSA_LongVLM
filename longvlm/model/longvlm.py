@@ -38,7 +38,7 @@ class LongVLMLlamaModel(LlamaModel):
 
         if hasattr(config, "use_mm_proj"):
             self.mm_projector = nn.Linear(config.mm_hidden_size, config.hidden_size)
-            # self.mm2 = nn.Linear(2048,1024)
+            self.mm2 = nn.Linear(2048,1024)
             
     def initialize_vision_modules(self, pretrain_mm_mlp_adapter=None, tune_mm_mlp_adapter=False):
         vision_config = self.vision_config
@@ -49,9 +49,10 @@ class LongVLMLlamaModel(LlamaModel):
 
         if not hasattr(self, 'mm_projector'):
             self.mm_projector = nn.Linear(vision_config.hidden_size, self.config.hidden_size)
-            # self.mm2 = nn.Linear(2048,1024)
+            self.mm2 = nn.Linear(2048,1024)
         
         if pretrain_mm_mlp_adapter is not None:
+            print("taking it from pretrained at 55 longvlm")
             mm_projector_weights = torch.load(pretrain_mm_mlp_adapter, map_location='cpu')
             self.mm_projector.load_state_dict({k.split('.')[-1]: v for k, v in mm_projector_weights.items()})
 
@@ -160,7 +161,6 @@ class LongVLMForCausalLM(LlamaForCausalLM):
     def __init__(self, config):
         super(LlamaForCausalLM, self).__init__(config)
         self.model = LongVLMLlamaModel(config)
-        self.mm2 = nn.Linear(2048,1024, bias=False)
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
         # Initialize weights and apply final processing
