@@ -8,7 +8,7 @@ from PIL import Image
 from tqdm import tqdm
 from decord import VideoReader, cpu
 from transformers import CLIPVisionModel, CLIPImageProcessor
-from longvlm.merge import merge_tokens 
+from longvlm.model.merge import merge_tokens 
 
 
 
@@ -56,8 +56,9 @@ def parse_args():
     parser.add_argument("--video_dir_path", required=True, help="Path to read the videos from.")
     parser.add_argument("--clip_feat_path_local", required=True, help="Output dir to save the local features.")
     parser.add_argument("--clip_feat_path_memory", required=True, help="The output dir to save the memory features.")
-    parser.add_argument("--pretrained_path", default="./pretrained/clip-vit-large-patch14", help="Path to load the model config from." )
-    parser.add_argument("--list_file", default="./datasets/anet/v1-2_val_subset_split1.txt", help="Path to the video list." )
+    parser.add_argument("--pretrained_path", default="openai/clip-vit-large-patch14", help="Path to load the model config from." )
+    parser.add_argument("--list_file", required=True, help="Path to the video list." )
+    parser.add_argument("--xy", required=True,)
     args = parser.parse_args()
 
     return args
@@ -72,11 +73,10 @@ def main():
     video_dir_path = args.video_dir_path
     clip_feat_path_local = args.clip_feat_path_local
     clip_feat_path_memory = args.clip_feat_path_memory
-    #clip_feat_path_all = args.clip_feat_path_all
-    infer_batch = args.infer_batch
-    #os.makedirs(clip_feat_path_pool, exist_ok=True)
+
     os.makedirs(clip_feat_path_local, exist_ok=True)
     os.makedirs(clip_feat_path_memory, exist_ok=True)
+    
     pretrained_path = args.pretrained_path
 
     # Initialize the CLIP model
@@ -91,6 +91,9 @@ def main():
 
     with open(args.list_file, 'r') as f:
         all_videos = f.read().splitlines() 
+    
+    x, y = args.xy.split("-")
+    all_videos = [i for i in os.listdir(video_dir_path) if "_60sec_" in i][int(x):int(y)]
 
     video_features = {}
     memory_features = {}
@@ -109,18 +112,30 @@ def main():
 
             with torch.no_grad():
                 image_forward_outs = vision_tower(video_tensor, output_hidden_states=True)
-            
+
             if not os.path.exists(f"{clip_feat_path_local}/{video_id}.pkl"):
-                video_features[video_id] = merge_tokens(image_forward_outs.hidden_states[-2][:, 1:], r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16")  # [1280, 640, 320, 160, 80, 40, 10]
-            
-            if not os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl"):
-                memory_features[video_id] = torch.cat([mem[:, :1] for mem in image_forward_outs.hidden_states], dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
-            counter += 1
+                feats = []
+                for i in [4,9,14,19,-2]:
+                    if i != -2:
+                        cat_features = torch.cat((image_forward_outs.hidden_states[i][:, 1:],
+                                                    image_forward_outs.hidden_states[i-5][:, 1:]), dim=-1)
+                    else:
+                        cat_features = torch.cat((image_forward_outs.hidden_states[-2][:, 1:],
+                                                    image_forward_outs.hidden_states[19][:, 1:]), dim=-1)
+                        
+                    feats.append(merge_tokens(cat_features, r_merge_list=[2880, 1440, 720, 360, 180, 90, 40]).detach().cpu().numpy().astype("float16"))  # [1280, 640, 320, 160, 80, 40, 10]
+                
+                feats = [torch.from_numpy(f) for f in feats]
+                video_features[video_id] = torch.cat(feats, dim=0)    
+
+                if not os.path.exists(f"{clip_feat_path_memory}/{video_id}.pkl"):
+                    memory_features[video_id] = torch.cat([mem[:, :1] for mem in image_forward_outs.hidden_states], dim=1).mean(0).squeeze(0).detach().cpu().numpy().astype("float16")
+                counter += 1
 
         except Exception as e:
             print(f"Can't process {video_path}: {e}")
 
-        if counter % 512 == 0:  # Save after every 512 videos, update this number as per your requirements
+        if counter % 50 == 0:  # Save after every 50 videos, update this number as per your requirements
             for key in video_features.keys():
                 clip_video_path = f"{clip_feat_path_local}/{key}.pkl"
                 if not os.path.exists(clip_video_path):

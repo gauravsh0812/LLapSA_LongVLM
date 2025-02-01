@@ -20,9 +20,11 @@ def apply_delta(base_model_path, target_model_path, delta_path):
     delta_tokenizer = AutoTokenizer.from_pretrained(delta_path)
 
     print("Applying delta")
+    # added by gauravs
     for name, param in tqdm(delta.state_dict().items(), desc="Applying delta"):
         if name not in base.state_dict():
-            assert name in ['model.mm_projector.weight', 'model.mm_projector.bias'], f'{name} not in base model'
+            assert name in ['model.mm_projector.weight', 'model.mm_projector.bias',
+                            'model.mm2.weight', 'model.mm2.bias'], f'{name} not in base model'
             continue
         if param.data.shape == base.state_dict()[name].shape:
             param.data += base.state_dict()[name]
