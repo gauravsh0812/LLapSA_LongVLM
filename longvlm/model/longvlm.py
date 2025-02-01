@@ -52,7 +52,6 @@ class LongVLMLlamaModel(LlamaModel):
             self.mm2 = nn.Linear(2048,1024)
         
         if pretrain_mm_mlp_adapter is not None:
-            print("taking it from pretrained at 55 longvlm")
             mm_projector_weights = torch.load(pretrain_mm_mlp_adapter, map_location='cpu')
             self.mm_projector.load_state_dict({k.split('.')[-1]: v for k, v in mm_projector_weights.items()})
 

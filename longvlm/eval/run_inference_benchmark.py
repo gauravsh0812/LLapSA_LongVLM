@@ -159,7 +159,8 @@ def run_inference(args):
             #     if os.path.exists(vid_path):
             with open(vid_path, 'rb') as f:
                 local_features = pickle.load(f)
-                local_features = torch.from_numpy(local_features).unsqueeze(0).cuda()
+                # local_features = torch.from_numpy(local_features).unsqueeze(0).cuda()
+                local_features = local_features.unsqueeze(0).cuda()
             video_token_len = local_features.shape[1]
                 # else:
                 #     print(f"{vid_path} not exists.")
