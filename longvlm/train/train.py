@@ -548,6 +548,7 @@ def train():
                                       pretrain_mm_mlp_adapter=model_args.pretrain_mm_mlp_adapter)
 
     params_no_grad = [n for n, p in model.named_parameters() if not p.requires_grad]
+    print([n for n, p in model.named_parameters() if  p.requires_grad])
     if len(params_no_grad) > 0:
         if training_args.fsdp is not None and len(training_args.fsdp) > 0:
             if len(params_no_grad) < 10:
