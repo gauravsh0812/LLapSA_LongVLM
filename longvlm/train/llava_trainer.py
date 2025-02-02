@@ -34,6 +34,6 @@ class LongVLMTrainer(Trainer):
             for k, v in _state_dict.items():
                 if any(key_match in k for key_match in keys_to_match):
                     weight_to_save[k] = v
-
+            print("llava trainer output_dir: ", output_dir)
             torch.save(weight_to_save, os.path.join(output_dir, f'mm_projector.bin'), )
         
