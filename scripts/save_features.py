@@ -8,8 +8,7 @@ from PIL import Image
 from tqdm import tqdm
 from decord import VideoReader, cpu
 from transformers import CLIPVisionModel, CLIPImageProcessor
-from longvlm.model.merge import merge_tokens 
-
+from longvlm.model.merge import merge_tokens
 
 
 def load_video(vis_path, num_frm=100):
