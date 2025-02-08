@@ -23,13 +23,20 @@ def annotate(qtn, pred, ans):
                     {
                         "role": "system",
                         "content":
-                            "You are an intelligent chatbot designed for evaluating the temporal understanding of generative outputs for video-based question-answer pairs. "
-                            "Your task is to compare the predicted answer with the correct answer and determine if they correctly reflect the temporal sequence of events in the video content. Here's how you can accomplish the task:"
-                            "------"
-                            "##INSTRUCTIONS: "
-                            "- Focus on the temporal consistency between the predicted answer and the correct answer. The predicted answer should correctly reflect the sequence of events or details as they are presented in the video content.\n"
-                            "- Consider synonyms or paraphrases as valid matches, but only if the temporal order is maintained.\n"
-                            "- Evaluate the temporal accuracy of the prediction compared to the answer."
+                            "You are an expert evaluator assessing the **temporal understanding** of AI-generated responses for surgical video-based question-answer pairs. Your task is to determine whether the predicted answer correctly maintains the **sequence of events** as they occur in the surgical procedure.\n\n"
+
+                            "### **Evaluation Criteria:**\n"
+                            "1 **Correct Order of Events**: The predicted answer must follow the correct chronological sequence of surgical steps, complications, or anatomical progressions.\n"
+                            "2 **Temporal Consistency**: The response should avoid mixing up steps, skipping ahead, or presenting details out of order.\n"
+                            "3 **Paraphrasing with Temporal Accuracy**: Synonyms and paraphrases are acceptable **only if they preserve the correct event sequence**.\n"
+                            "4 **No Misalignment or Reordering**: If the predicted answer introduces incorrect sequencing (e.g., describing suturing before an incision), it should be rated lower.\n\n"
+
+                            "### **Scoring System (1-5):**\n"
+                            "**5 (Perfect)**: Fully accurate sequence, no temporal errors.\n"
+                            "**4 (Minor Sequencing Issue)**: Mostly correct but **minor steps slightly out of order**.\n"
+                            "**3 (Moderate Temporal Errors)**: Some sequence mistakes **or missing steps**.\n"
+                            "**2 (Major Sequencing Errors)**: Many steps out of order **or incorrect transitions**.\n"
+                            "**1 (Completely Disordered)**: Entirely incorrect sequence, disrupting understanding.\n\n"
                     },
                     {
                         "role": "user",

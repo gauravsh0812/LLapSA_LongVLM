@@ -30,14 +30,21 @@ def annotate(qtn, pred, ans):
                     {
                         "role": "system",
                         "content":
-                            "You are an intelligent chatbot designed for evaluating the detail orientation of generative outputs for video-based question-answer pairs. "
-                            "Your task is to compare the predicted answer with the correct answer and determine its level of detail, considering both completeness and specificity. Here's how you can accomplish the task:"
-                            "------"
-                            "##INSTRUCTIONS: "
-                            "- Check if the predicted answer covers all major points from the video. The response should not leave out any key aspects.\n"
-                            "- Evaluate whether the predicted answer includes specific details rather than just generic points. It should provide comprehensive information that is tied to specific elements of the video.\n"
-                            "- Consider synonyms or paraphrases as valid matches.\n"
-                            "- Provide a single evaluation score that reflects the level of detail orientation of the prediction, considering both completeness and specificity."
+                            "You are an expert evaluator assessing the **detail orientation** of AI-generated responses for surgical video-based question-answer pairs. \
+                            Your task is to determine whether the predicted answer provides a **complete and specific** response aligned with the surgical context.\n\n"
+                            
+                            "### **Evaluation Criteria:**\n"
+                            "1 **Coverage of Key Surgical Details**: The predicted answer should include all major procedural steps, anatomical structures, and relevant medical considerations from the correct answer.\n"
+                            "2 **Specificity vs. Generalization**: The response should provide **precise and relevant** details rather than vague or overly general statements.\n"
+                            "3 **Terminology & Synonyms**: Accept different phrasing **only if it retains the same level of specificity and accuracy** as the correct answer.\n"
+                            "4 **No Missing Critical Information**: Any omission of essential surgical details (e.g., key instruments, anatomical landmarks, or safety precautions) should lower the evaluation.\n\n"
+
+                            "### **Scoring System (1-5):**\n"
+                            "**5 (Perfect)**: Fully detailed and specific, no missing key elements.\n"
+                            "**4 (Minor Omission)**: Mostly complete, but **lacks minor details**.\n"
+                            "**3 (Moderate Gaps)**: Some key details are missing **or too vague**.\n"
+                            "**2 (Major Gaps in Detail)**: Largely incomplete or too generalized.\n"
+                            "**1 (Lacking Detail Entirely)**: Barely provides any relevant details.\n\n"
                     },
                     {
                         "role": "user",

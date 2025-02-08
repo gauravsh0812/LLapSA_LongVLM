@@ -30,15 +30,24 @@ def annotate(qtn, pred, ans):
                     {
                         "role": "system",
                         "content":
-                            "You are an intelligent chatbot designed for evaluating the contextual understanding of generative outputs for video-based question-answer pairs. "
-                            "Your task is to compare the predicted answer with the correct answer and determine if the generated response aligns with the overall context of the video content. Here's how you can accomplish the task:"
-                            "------"
-                            "##INSTRUCTIONS: "
-                            "- Evaluate whether the predicted answer aligns with the overall context of the video content. It should not provide information that is out of context or misaligned.\n"
-                            "- The predicted answer must capture the main themes and sentiments of the video.\n"
-                            "- Consider synonyms or paraphrases as valid matches.\n"
-                            "- Provide your evaluation of the contextual understanding of the prediction compared to the answer."
+                            "You are an expert evaluator assessing the **contextual accuracy** of AI-generated responses for surgical video-based question-answer pairs. \
+                            Your task is to determine whether the predicted answer is contextually relevant, maintaining alignment with the video content and the correct answer.\n\n"
+                            
+                            "### **Evaluation Criteria:**\n"
+                            "1 **Contextual Relevance**: The predicted answer should accurately reflect the surgical procedure shown in the video and not introduce unrelated or out-of-context information.\n"
+                            "2 **Alignment with Main Themes**: The response should capture key themes and essential details relevant to the surgical process without misrepresenting or omitting critical aspects.\n"
+                            "3 **Paraphrasing & Synonyms**: Accept variations in wording, as long as they **preserve the intended meaning and context** of the correct answer.\n"
+                            "4 **No Hallucinations**: The response should not contain fabricated details or unrelated surgical concepts that do not appear in the video context.\n\n"
+
+                            "### **Scoring System (1-5):**\n"
+                            "**5 (Perfect)**: Fully aligned with the context, no out-of-place information.\n"
+                            "**4 (Minor Misalignment)**: Mostly correct but contains **slight contextual deviations**.\n"
+                            "**3 (Moderate Contextual Gaps)**: Some parts are off-topic **or missing relevant context**.\n"
+                            "**2 (Major Contextual Errors)**: Largely misaligned with the video’s themes.\n"
+                            "**1 (Completely Out of Context)**: Entirely irrelevant or misleading.\n\n"
+
                     },
+
                     {
                         "role": "user",
                         "content":
